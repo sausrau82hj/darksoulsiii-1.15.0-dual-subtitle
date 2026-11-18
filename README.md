@@ -16,60 +16,36 @@ DARK SOULS III 1.15.0 — 以中文显示时下方给出英文，以英文显示
 - 安装前**关闭游戏**，装完**离线**启动（改过文本文件，避免联机风险）。
 - 若另有 mod 也改 `msg`，两者会互相覆盖。
 
-### 安装（手动，三步）
+### 安装
 
-1. 下载本仓库（Code → Download ZIP 或 `git clone`），解压到任意位置，例如 `D:\Mods\DualSubtitle`。
-2. 备份原版文本包。**只做一次**，重复做会把已经双语的文件当成原版备份。
-3. 把包里的 `msg\zhocn\*` 与 `msg\engus\*` 覆盖到游戏 `Game\msg\` 下同名目录。
+前提：游戏已用 UXM / Nuxe 解包（`Game\msg\` 里是散文件），且已关闭。
 
-PowerShell 里两段都是整段粘贴执行（`$mod` 改成你解压的位置，`$game` 改成你的游戏目录）：
+先备份原版，**只做一次**，再覆盖 —— 每语言 6 个包，`menu.msgbnd.dcx` / `item.msgbnd.dcx` 是本体文件名，必须有：
 
 ```powershell
-$mod  = "D:\Mods\DualSubtitle"
+$mod  = "D:\Mods\DualSubtitle"      # 本包解压位置
 $game = "D:\steam\steamapps\common\DARK SOULS III\Game"
 
-# 1) 备份原版（已存在同名备份则不覆盖，保证备份永远是原版）
 foreach ($l in 'zhocn','engus') {
     New-Item -ItemType Directory -Force "$game\.dualsub-backup\msg\$l" | Out-Null
     Get-ChildItem "$game\msg\$l\*.msgbnd.dcx" | ForEach-Object {
         $b = "$game\.dualsub-backup\msg\$l\$($_.Name)"
         if (-not (Test-Path -LiteralPath $b)) { Copy-Item -LiteralPath $_.FullName -Destination $b }
     }
+    Copy-Item "$mod\msg\$l\*.msgbnd.dcx" "$game\msg\$l\" -Force
 }
-
-# 2) 覆盖安装
-foreach ($l in 'zhocn','engus') { Copy-Item "$mod\msg\$l\*.msgbnd.dcx" "$game\msg\$l\" -Force }
 ```
 
-不想用命令行就在资源管理器里手动做同样的事：进 `$mod\msg\zhocn`，全选 6 个 `.msgbnd.dcx` 覆盖进 `Game\msg\zhocn`；`engus` 同样。用哪种都行，备份一定先做。
+已存在的备份不会被覆盖，所以这段重复跑也安全。手动做就是把这 12 个 `.msgbnd.dcx` 拖进对应目录（先用资源管理器复制一份原版出来）。装完离线启动。
 
-装的是这 12 个文件（每语言 6 个）：
-
-```
-msg\zhocn\menu.msgbnd.dcx        msg\engus\menu.msgbnd.dcx
-msg\zhocn\menu_dlc1.msgbnd.dcx   msg\engus\menu_dlc1.msgbnd.dcx
-msg\zhocn\menu_dlc2.msgbnd.dcx   msg\engus\menu_dlc2.msgbnd.dcx
-msg\zhocn\item.msgbnd.dcx        msg\engus\item.msgbnd.dcx
-msg\zhocn\item_dlc1.msgbnd.dcx   msg\engus\item_dlc1.msgbnd.dcx
-msg\zhocn\item_dlc2.msgbnd.dcx   msg\engus\item_dlc2.msgbnd.dcx
-```
-
-两个语言槽都装，游戏语言切中文或英文都能看到双语。只玩一种语言的话，只覆盖那一个目录也行。
-
-`menu.msgbnd.dcx` / `item.msgbnd.dcx` 是**本体文件名**：游戏读本体文本时会找这两份，所以必须有（内容就是累积版 DLC2 的副本）。
-
-### 卸载（手动）
-
-把备份覆盖回去：
+### 卸载
 
 ```powershell
 $game = "D:\steam\steamapps\common\DARK SOULS III\Game"
 foreach ($l in 'zhocn','engus') { Copy-Item "$game\.dualsub-backup\msg\$l\*.msgbnd.dcx" "$game\msg\$l\" -Force }
 ```
 
-UXM 解包后这 12 个文件在游戏目录里本来就存在，所以卸载就是覆盖回原版字节，不用删文件。确认还原无误后再删 `.dualsub-backup`，可以先留着。
-
-若当初没做备份：用 UXM / Nuxe 重新解包这两个目录，或者 Steam「验证文件完整性」（会覆盖掉所有改动，包括别的 mod 的）。
+这 12 个文件本来是游戏自带的，覆盖回原版即可，不用删。没备份就用 UXM / Nuxe 重新解包，或 Steam「验证文件完整性」（会连别的 mod 一起清掉）。
 
 ### 成品实际覆盖哪些文本
 
@@ -156,60 +132,36 @@ Adds the *other* language underneath the one you already display: with Simplifie
 - Close the game before installing, and start it **offline** afterwards (text files are modified — avoid online play).
 - If another mod also replaces `msg` files, the two overwrite each other.
 
-### Install (manual, three steps)
+### Install
 
-1. Download this repository (Code → Download ZIP, or `git clone`) and unpack it anywhere, e.g. `D:\Mods\DualSubtitle`.
-2. Back up the vanilla packs. Do this **once** — repeating it would back up already-bilingual files as if they were vanilla.
-3. Overwrite the game's `Game\msg\<lang>\` folders with this package's `msg\zhocn\*` and `msg\engus\*`.
+Requires the loose-file setup (unpacked with UXM / Nuxe, so `Game\msg\` holds real files) and the game closed.
 
-Both PowerShell blocks below are meant to be pasted whole (`$mod` = where you unpacked it, `$game` = your game folder):
+Back up the vanilla packs **once**, then overwrite — 6 packs per language; `menu.msgbnd.dcx` / `item.msgbnd.dcx` carry the base filenames and must be present:
 
 ```powershell
-$mod  = "D:\Mods\DualSubtitle"
+$mod  = "D:\Mods\DualSubtitle"      # where you unpacked it
 $game = "D:\steam\steamapps\common\DARK SOULS III\Game"
 
-# 1) back up the vanilla packs (never overwrites an existing backup, so the backup stays vanilla)
 foreach ($l in 'zhocn','engus') {
     New-Item -ItemType Directory -Force "$game\.dualsub-backup\msg\$l" | Out-Null
     Get-ChildItem "$game\msg\$l\*.msgbnd.dcx" | ForEach-Object {
         $b = "$game\.dualsub-backup\msg\$l\$($_.Name)"
         if (-not (Test-Path -LiteralPath $b)) { Copy-Item -LiteralPath $_.FullName -Destination $b }
     }
+    Copy-Item "$mod\msg\$l\*.msgbnd.dcx" "$game\msg\$l\" -Force
 }
-
-# 2) install
-foreach ($l in 'zhocn','engus') { Copy-Item "$mod\msg\$l\*.msgbnd.dcx" "$game\msg\$l\" -Force }
 ```
 
-No command line? Do the same by hand in Explorer: open `$mod\msg\zhocn`, select the 6 `.msgbnd.dcx` files and overwrite them into `Game\msg\zhocn`; same for `engus`. Either way, back up first.
+An existing backup is never overwritten, so rerunning this is safe. By hand: copy the 12 `.msgbnd.dcx` into the matching folders (save the originals first). Start the game offline.
 
-The 12 files that get installed (6 per language):
-
-```
-msg\zhocn\menu.msgbnd.dcx        msg\engus\menu.msgbnd.dcx
-msg\zhocn\menu_dlc1.msgbnd.dcx   msg\engus\menu_dlc1.msgbnd.dcx
-msg\zhocn\menu_dlc2.msgbnd.dcx   msg\engus\menu_dlc2.msgbnd.dcx
-msg\zhocn\item.msgbnd.dcx        msg\engus\item.msgbnd.dcx
-msg\zhocn\item_dlc1.msgbnd.dcx   msg\engus\item_dlc1.msgbnd.dcx
-msg\zhocn\item_dlc2.msgbnd.dcx   msg\engus\item_dlc2.msgbnd.dcx
-```
-
-Both language slots are filled, so the mod works whichever language the game displays. If you only ever use one, overwriting that one folder alone is enough.
-
-`menu.msgbnd.dcx` / `item.msgbnd.dcx` carry the **base filenames**: the game looks for them first when reading base-game text, so they must be present (their content is a copy of the cumulative DLC2 version).
-
-### Uninstall (manual)
-
-Copy the backups back:
+### Uninstall
 
 ```powershell
 $game = "D:\steam\steamapps\common\DARK SOULS III\Game"
 foreach ($l in 'zhocn','engus') { Copy-Item "$game\.dualsub-backup\msg\$l\*.msgbnd.dcx" "$game\msg\$l\" -Force }
 ```
 
-After a UXM unpack all 12 files exist in the game folder anyway, so uninstalling means restoring the original bytes — nothing to delete. Keep `.dualsub-backup` until you are sure, then remove it.
-
-No backup? Re-unpack those folders with UXM / Nuxe, or use Steam's "verify integrity of game files" (which wipes every modification, including other mods').
+Those 12 files ship with the game, so restoring the originals is enough — nothing to delete. No backup? Re-unpack with UXM / Nuxe, or use Steam's "verify integrity" (which also wipes other mods' changes).
 
 ### What is actually bilingual in the shipped build
 
