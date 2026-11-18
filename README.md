@@ -24,11 +24,6 @@ DARK SOULS III 1.15.0 — 以中文显示时下方给出英文，以英文显示
 
 ### 卸载
 
-```powershell
-$game = "D:\steam\steamapps\common\DARK SOULS III\Game"
-foreach ($l in 'zhocn','engus') { Copy-Item "$game\.dualsub-backup\msg\$l\*.msgbnd.dcx" "$game\msg\$l\" -Force }
-```
-
 这 12 个文件本来是游戏自带的，覆盖回原版即可，不用删。没备份就用 UXM / Nuxe 重新解包，或 Steam「验证文件完整性」（会连别的 mod 一起清掉）。
 
 ### 成品实际覆盖哪些文本
@@ -123,11 +118,6 @@ Requires the loose-file setup (unpacked with UXM / Nuxe, so `Game\msg\` holds re
 Back up the vanilla packs **once**, then overwrite — 6 packs per language; `menu.msgbnd.dcx` / `item.msgbnd.dcx` carry the base filenames and must be present
 
 ### Uninstall
-
-```powershell
-$game = "D:\steam\steamapps\common\DARK SOULS III\Game"
-foreach ($l in 'zhocn','engus') { Copy-Item "$game\.dualsub-backup\msg\$l\*.msgbnd.dcx" "$game\msg\$l\" -Force }
-```
 
 Those 12 files ship with the game, so restoring the originals is enough — nothing to delete. No backup? Re-unpack with UXM / Nuxe, or use Steam's "verify integrity" (which also wipes other mods' changes).
 
