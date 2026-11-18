@@ -20,23 +20,7 @@ DARK SOULS III 1.15.0 — 以中文显示时下方给出英文，以英文显示
 
 前提：游戏已用 UXM / Nuxe 解包（`Game\msg\` 里是散文件），且已关闭。
 
-先备份原版，**只做一次**，再覆盖 —— 每语言 6 个包，`menu.msgbnd.dcx` / `item.msgbnd.dcx` 是本体文件名，必须有：
-
-```powershell
-$mod  = "D:\Mods\DualSubtitle"      # 本包解压位置
-$game = "D:\steam\steamapps\common\DARK SOULS III\Game"
-
-foreach ($l in 'zhocn','engus') {
-    New-Item -ItemType Directory -Force "$game\.dualsub-backup\msg\$l" | Out-Null
-    Get-ChildItem "$game\msg\$l\*.msgbnd.dcx" | ForEach-Object {
-        $b = "$game\.dualsub-backup\msg\$l\$($_.Name)"
-        if (-not (Test-Path -LiteralPath $b)) { Copy-Item -LiteralPath $_.FullName -Destination $b }
-    }
-    Copy-Item "$mod\msg\$l\*.msgbnd.dcx" "$game\msg\$l\" -Force
-}
-```
-
-已存在的备份不会被覆盖，所以这段重复跑也安全。手动做就是把这 12 个 `.msgbnd.dcx` 拖进对应目录（先用资源管理器复制一份原版出来）。装完离线启动。
+先备份原版，**只做一次**，再覆盖 —— 每语言 6 个包，`menu.msgbnd.dcx` / `item.msgbnd.dcx` 是本体文件名，必须有
 
 ### 卸载
 
@@ -136,23 +120,7 @@ Adds the *other* language underneath the one you already display: with Simplifie
 
 Requires the loose-file setup (unpacked with UXM / Nuxe, so `Game\msg\` holds real files) and the game closed.
 
-Back up the vanilla packs **once**, then overwrite — 6 packs per language; `menu.msgbnd.dcx` / `item.msgbnd.dcx` carry the base filenames and must be present:
-
-```powershell
-$mod  = "D:\Mods\DualSubtitle"      # where you unpacked it
-$game = "D:\steam\steamapps\common\DARK SOULS III\Game"
-
-foreach ($l in 'zhocn','engus') {
-    New-Item -ItemType Directory -Force "$game\.dualsub-backup\msg\$l" | Out-Null
-    Get-ChildItem "$game\msg\$l\*.msgbnd.dcx" | ForEach-Object {
-        $b = "$game\.dualsub-backup\msg\$l\$($_.Name)"
-        if (-not (Test-Path -LiteralPath $b)) { Copy-Item -LiteralPath $_.FullName -Destination $b }
-    }
-    Copy-Item "$mod\msg\$l\*.msgbnd.dcx" "$game\msg\$l\" -Force
-}
-```
-
-An existing backup is never overwritten, so rerunning this is safe. By hand: copy the 12 `.msgbnd.dcx` into the matching folders (save the originals first). Start the game offline.
+Back up the vanilla packs **once**, then overwrite — 6 packs per language; `menu.msgbnd.dcx` / `item.msgbnd.dcx` carry the base filenames and must be present
 
 ### Uninstall
 
