@@ -260,7 +260,6 @@ DEFAULT_CATEGORIES = {
     "Item Descriptions": True,
     "Item Lore": True,
     "Blood Messages": True,
-    "Other": True,
 }
 
 def category_of(fmg: str) -> str:

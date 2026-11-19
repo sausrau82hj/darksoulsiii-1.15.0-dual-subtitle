@@ -16,7 +16,6 @@
     "Item Names": true,
     "Item Descriptions": true,
     "Item Lore": true,
-    "Blood Messages": true,
-    "Other": true
+    "Blood Messages": true
   }
 }
