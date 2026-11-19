@@ -202,7 +202,7 @@ class FmgXml:
                 continue
             if norm(t1) == norm(t2):
                 continue
-            if t1.strip() in skip_texts:
+            if t1.strip() in skip_texts or t2.strip() in skip_texts:
                 continue
             use_sep = sep
             if use_sep is None:

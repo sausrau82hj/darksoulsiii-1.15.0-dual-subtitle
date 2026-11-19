@@ -4,7 +4,17 @@
   "secondary": "engus",
   "separator": "\n",
   "default_enabled": true,
-  "skip_merge_texts": ["是", "否", "确定", "取消"],
+  "skip_merge_texts": [
+    "是",
+    "否",
+    "确定",
+    "取消",
+    "YES",
+    "NO",
+    "OK",
+    "CANCEL",
+    "Confirm"
+  ],
   "categories": {
     "Dialogue": true,
     "Cutscene Subtitles": true,
