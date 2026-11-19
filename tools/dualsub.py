@@ -11,7 +11,7 @@
   5. 重新打包回 .msgbnd.dcx，输出到 mod 目录，供 UXM 松散文件加载
 
 用法:
-  python dualsub.py --list                        # 列出文本包和 FMG，生成配置模板
+  python dualsub.py --list                        # 导出分类配置模板
   python dualsub.py                               # 按配置生成全部
   python dualsub.py --filter menu_dlc1            # 只处理某个文本包（调试）
   python dualsub.py --game "D:\\...\\Game" --out "D:\\game\\dark souls3\\mod\\DualSubtitle"
@@ -137,6 +137,17 @@ def is_null(t) -> bool:
     return t is None or t.strip().lower() in NULL_MARKERS
 
 
+def is_already_merged(t1: str, t2: str, sep: str) -> bool:
+    """判断这对文本是否已经合并过（形如 A+sep+B / B+sep+A），重复构建时跳过。"""
+    if not sep:
+        return False
+    if t1.endswith(sep + t2) or t2.endswith(sep + t1):
+        return True
+    a, b = t1.split(sep), t2.split(sep)
+    # 合并后的两份文本是「同一批片段、顺序相反」；多行文本会拆成 3 段以上，所以比较排序后的片段集合
+    return len(a) > 1 and len(b) > 1 and sorted(a) == sorted(b)
+
+
 class Yabber:
     def __init__(self, directory: str):
         self.exe = os.path.join(directory, "Yabber.exe")
@@ -187,12 +198,12 @@ class FmgXml:
                 continue
             if t1.strip() in skip_texts:
                 continue
-            # 幂等：已经合并过的（含两种语言）跳过
-            if (t1.endswith(t2) and t1 != t2) or (t2.endswith(t1) and t2 != t1):
-                continue
             use_sep = sep
             if use_sep is None:
                 use_sep = "\n" if ("\n" in t1 or "\n" in t2) else " / "
+            # 幂等：已经合并过（A+分隔符+B / B+分隔符+A）的条目跳过，重复构建不会叠加两次
+            if is_already_merged(t1, t2, use_sep):
+                continue
             new1, new2 = t1 + use_sep + t2, t2 + use_sep + t1
             el.text, other_el.text = new1, new2
             changed += 1
@@ -207,9 +218,10 @@ class FmgXml:
             other_el = other.entries.get(key)
             if other_el is None:
                 continue
-            if is_null(el.text) or is_null(other_el.text):
+            if is_null(other_el.text):
                 continue
-            if norm(el.text) == norm(other_el.text):
+            # 本语言是空的（%null%）时也要填上副语言，否则玩家看到的还是空白
+            if not is_null(el.text) and norm(el.text) == norm(other_el.text):
                 continue
             el.text = other_el.text
             changed += 1
@@ -476,6 +488,13 @@ def build_one(game: str, out: str, cfg: dict, name: str, log, keep_work: bool,
         else:
             log(f"  = {fmg}: nothing to merge")
 
+    if not stats["entries"]:
+        # 一个条目都没合并 → 这个包与原版相同，装进去只会多一份风险，直接跳过
+        log(f"  = nothing merged in {name}, not installed")
+        if not keep_work:
+            shutil.rmtree(work, ignore_errors=True)
+        return stats
+
     for lang in (primary, secondary):
         r = results[lang]
         y.run(y.exe, r["unpacked"])            # folder -> msgbnd
@@ -490,8 +509,8 @@ def build_one(game: str, out: str, cfg: dict, name: str, log, keep_work: bool,
     return stats
 
 
-def do_list(game: str, cfg_path: str, primary: str, secondary: str) -> None:
-    """生成中文分类配置（不需要日文文件名）。"""
+def do_list(cfg_path: str, primary: str, secondary: str) -> None:
+    """写一份分类配置模板（不需要游戏目录，也不需要日文文件名）。"""
     template = {
         "primary": primary,
         "secondary": secondary,
@@ -517,14 +536,9 @@ def main(argv=None) -> int:
     ap.add_argument("--secondary", default=None, help="副语言目录 (默认 engus)")
     ap.add_argument("--filter", default=None, help="只处理名称匹配的文本包 (通配符)")
     ap.add_argument("--source", default=None, help="原始 msg 来源目录（默认与 --game 相同）")
-    ap.add_argument("--list", action="store_true", help="列出文本包并生成配置模板")
+    ap.add_argument("--list", action="store_true", help="导出分类配置模板（默认 tools/dualsub.template.json）")
     ap.add_argument("--keep-work", action="store_true", help="保留中间文件")
     args = ap.parse_args(argv)
-
-    if not args.out:
-        args.out = DEFAULT_OUT
-        print(f"未指定 --out，输出到脚本目录: {args.out}")
-        print(f"no --out given, writing to {args.out}")
 
     cfg = load_config(args.config)
     if args.primary:
@@ -533,16 +547,22 @@ def main(argv=None) -> int:
         cfg["secondary"] = args.secondary
     primary, secondary = cfg.get("primary", "zhocn"), cfg.get("secondary", "engus")
 
-    game = args.game or default_game()
-    if not os.path.isdir(game):
-        raise SystemExit(f"Game directory not found: {game}\n"
-                         "用 --game 指定 {游戏}\\Game 目录。")
-
     if args.list:
-        do_list(game, args.config, primary, secondary)
+        # 只是导出模板，不需要游戏目录；默认别覆盖正在用的配置
+        if os.path.abspath(args.config) == os.path.abspath(DEFAULT_CONFIG):
+            args.config = os.path.join(os.path.dirname(DEFAULT_CONFIG), "dualsub.template.json")
+        do_list(args.config, primary, secondary)
         return 0
 
-    src_game = args.source or game
+    src_game = args.source or args.game or default_game()
+    if not os.path.isdir(src_game):
+        raise SystemExit(f"Text pack directory not found: {src_game}\n"
+                         "用 --source 指向本包的 source 目录，或用 --game 指定 {游戏}\\Game 目录。")
+
+    if not args.out:
+        args.out = DEFAULT_OUT
+        print(f"未指定 --out，输出到脚本目录 / no --out given, writing to {args.out}")
+
     names = discover(src_game, primary, secondary)
     # ngword 是屏蔽词表，不参与双语显示
     names = [n for n in names if not stem_of(n).lower().startswith("ngword")]
@@ -552,7 +572,7 @@ def main(argv=None) -> int:
         raise SystemExit("No text packs to process (base text may not be unpacked)")
 
     t0 = time.time()
-    print(f"Game: {game}")
+    print(f"Source: {src_game}")
     print(f"Output: {args.out}")
     print(f"Languages: {primary} + {secondary}, {len(names)} packs\n")
     all_stats = []
@@ -563,9 +583,13 @@ def main(argv=None) -> int:
 
     # 本体文本文件: 游戏读 menu.msgbnd / item.msgbnd 时若没有松散副本会回退到归档原版，
     # 导致本体文本不生效。用累积版 DLC2（没有则 DLC1）的生成结果补一份本体文件名。
+    # 只给本次真的合并过内容的包补（没合并过的包不装）。
+    built = {stem_of(s["file"]) for s in all_stats if s["entries"]}
     for base in ("menu", "item"):
         for lang in (primary, secondary):
             for cand in (f"{base}_dlc2.msgbnd.dcx", f"{base}_dlc1.msgbnd.dcx"):
+                if stem_of(cand) not in built:
+                    continue
                 src = os.path.join(args.out, "msg", lang, cand)
                 if os.path.exists(src):
                     dst = os.path.join(args.out, "msg", lang, f"{base}.msgbnd.dcx")
