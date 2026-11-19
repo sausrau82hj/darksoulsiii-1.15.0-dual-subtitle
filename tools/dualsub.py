@@ -190,13 +190,12 @@ class FmgXml:
     def write(self) -> None:
         self.tree.write(self.path, xml_declaration=True, encoding="utf-8")
 
-    def merge(self, other: "FmgXml", sep, log, skip_texts=None) -> int:
+    def merge(self, other: "FmgXml", sep, log) -> int:
         """Append every text of other behind self, and self behind other.
         sep=None picks per entry: a newline when the source has one, otherwise ' / '
-        (single-line widgets). Texts listed in skip_texts (exact match) are not merged, so
-        narrow buttons and labels are never truncated. Returns the number of edits."""
+        (single-line widgets). Every entry is merged, short answers such as 是/否 included.
+        Returns the number of edits."""
         changed = 0
-        skip_texts = skip_texts or ()
         for key, el in self.entries.items():
             other_el = other.entries.get(key)
             if other_el is None:
@@ -205,8 +204,6 @@ class FmgXml:
             if is_null(t1) or is_null(t2):
                 continue
             if norm(t1) == norm(t2):
-                continue
-            if t1.strip() in skip_texts or t2.strip() in skip_texts:
                 continue
             use_sep = sep
             if use_sep is None:
@@ -436,7 +433,6 @@ def build_one(game: str, out: str, cfg: dict, name: str, log, keep_work: bool,
     sep = cfg.get("separator", "\n")
     if sep == "\\n":
         sep = "\n"
-    skip_texts = set(cfg.get("skip_merge_texts", []))
     stem = stem_of(name)
     work = os.path.join(out, "_work", stem)
     if os.path.isdir(work):
@@ -490,7 +486,7 @@ def build_one(game: str, out: str, cfg: dict, name: str, log, keep_work: bool,
             n = x1.replace_texts_from(x2)
         else:
             fmg_sep = separator_for(cfg, name, fmg)
-            n = x1.merge(x2, fmg_sep, log, skip_texts)
+            n = x1.merge(x2, fmg_sep, log)
         if n:
             x1.write(); x2.write()
             y.run(y.exe, p1 + ".xml")          # xml -> fmg
@@ -575,7 +571,7 @@ def main(argv=None) -> int:
     src_game = (pack_src if use_pack_src else None) or args.source or args.game or default_game()
     if not os.path.isdir(src_game):
         raise SystemExit(f"Text pack directory not found: {src_game}\n"
-                         "用 --source 指向本包的 source 目录，或用 --game 指定 {游戏}\Game 目录。")
+                         r"用 --source 指向本包的 source 目录，或用 --game 指定 {游戏}\Game 目录。")
 
     if not args.out:
         args.out = PACK_ROOT if use_pack_src else DEFAULT_OUT

@@ -38,6 +38,8 @@ robocopy msg "$Game\msg" /E
 | ムービー字幕（过场字幕） | **开** | 同上 |
 | 菜单、按键提示、道具名/说明/背景故事、地名、帮助、血字留言、系统消息、事件文本 | 关 | 保持原版单语 |
 
+启用的类别里**逐条全部合并，不按词跳过**：`是` / `否` / `确定` / `取消` 这类短词同样会带上另一语言。不想让某一类双语就把它设成 `"off"`。
+
 要开别的类别，改 `tools\dualsub.config.json` 里的 `categories` 再重新生成。开了道具名/说明/背景故事，成品里就会多出 `item*.msgbnd.dcx`，照第 2 步一起覆盖即可（上面备份已经把 item 包一起备下）。长说明类（道具说明、背景故事）面板放不下两种语言，建议设成 `"en_only"` 只看英文。
 
 ### 重新生成
@@ -55,7 +57,7 @@ python tools\dualsub.py
 
 要换路径或只重建一部分时才加参数：`--source` / `--out`（这一步的源和成品目录）、`--yabber`（Yabber 不在包内时）、`--filter "menu*"`（只重建匹配的包）、`--list`（导出分类模板到 `tools\dualsub.template.json`）、`--keep-work`（保留中间文件查错）。
 
-配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（默认换行）、`default_enabled`（没在 `categories` 里列出的类别是否合并）、`skip_merge_texts`（永不合并的短词，如 是/否/确定/取消 —— 中英两种写法都列了，主副对调时照样生效）、`categories`（`true` 双语 · `"off"` 原样 · `"en_only"` 只留副语言 · `"append"` 强行追加）、`files`（按包、按 FMG 覆盖分隔符，如 `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
+配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（默认换行）、`default_enabled`（没在 `categories` 里列出的类别是否合并）、`categories`（`true` 双语 · `"off"` 原样 · `"en_only"` 只留副语言 · `"append"` 强行追加）、`files`（按包、按 FMG 覆盖分隔符，如 `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
 
 分隔符是自动的：对话、字幕、说明类用换行，名称、地名、按键提示用 ` / `。
 
@@ -99,6 +101,8 @@ Copy the `menu*.dcx` files from `D:\ds3-msg-backup\zhocn\` and `\engus\` back in
 | ムービー字幕 (cutscene subtitles) | **on** | same |
 | Menus, key prompts, item names/descriptions/lore, place names, help text, blood messages, system messages, event text | off | vanilla single language |
 
+Every entry in an enabled category is merged — **nothing is skipped by word**, so short answers like `是` / `否` also carry the other language. Put a category at `"off"` if you do not want it bilingual.
+
 Turn more on under `categories` in `tools\dualsub.config.json` and rebuild: enabling item names/descriptions/lore also produces `item*.msgbnd.dcx`, which you then copy over with step 2 (the backup above already covers the item packs). Long description panels cannot fit both languages — set those to `"en_only"` to read the English instead.
 
 ### Rebuild
@@ -116,7 +120,7 @@ No arguments is the default: it reads the bundled `source\` and writes the packs
 
 Arguments only when you need a different path or a partial rebuild: `--source` / `--out` (source and output folders), `--yabber` (Yabber outside the package), `--filter "menu*"` (rebuild matching packs only), `--list` (write the category template to `tools\dualsub.template.json`), `--keep-work` (keep intermediate files).
 
-Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (default newline), `default_enabled` (whether categories missing from `categories` get merged), `skip_merge_texts` (short strings never merged, e.g. 是/否/确定/取消 — both language spellings are listed, so the skip list still works when the roles are swapped), `categories` (`true` bilingual · `"off"` untouched · `"en_only"` secondary language only · `"append"` force-append), `files` (per-pack, per-FMG separator override, e.g. `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
+Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (default newline), `default_enabled` (whether categories missing from `categories` get merged), `categories` (`true` bilingual · `"off"` untouched · `"en_only"` secondary language only · `"append"` force-append), `files` (per-pack, per-FMG separator override, e.g. `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
 
 The separator is chosen automatically: dialogue, subtitles and descriptions use a newline; names, place names and key prompts use ` / `.
 
