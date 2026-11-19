@@ -45,6 +45,10 @@ python tools\dualsub.py
 
 [WitchyBND](https://github.com/ividyon/WitchyBND/releases) ：解包，修改，打包，替换。
 
+###致谢
+
+受到此项目启发而制。[ER-Dualsub-Tool](https://github.com/matyamod/ER-Dualsub-Tool)
+
 ---
 
 ## English
@@ -86,6 +90,10 @@ Separators: text that already wraps keeps a newline and is not configurable; sin
 ### Finer edits
 
 [WitchyBND](https://github.com/ividyon/WitchyBND/releases): unpack, edit, pack, replace.
+
+###Credits
+
+Inspired by this one.[ER-Dualsub-Tool](https://github.com/matyamod/ER-Dualsub-Tool)
 
 ---
 
