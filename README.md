@@ -32,7 +32,7 @@ python tools\dualsub.py
 不带参数就是默认行为：拿包里的 `source\` 当源，成品写回包里的 `msg\`，跑完按上面第 2 步覆盖进游戏。
 要换路径或只重建一部分时才加参数：`--source` / `--out`（这一步的源和成品目录）、`--yabber`（Yabber 不在包内时）、`--filter "menu*"`（只重建匹配的包）、`--keep-work`（保留中间文件查错）。
 
-配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（单行文本的分隔符，默认 `" / "`）、`categories`（取值 `true` 合并双语 · `"off"` 原样不动 · `"sec_only"` 只留副语言）、`files`（例外清单，按包、按 FMG 单独设 `mode` / `enabled` / `separator`，优先级最高，如 `"files": {"menu_dlc2": {"fmg": {"地名.fmg": {"separator": " ~ "}, "アイテムうんちく.fmg": "sec_only"}}}`。
+配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（单行文本的分隔符，默认 `" / "`）、`categories`（默认只开 `Dialogue` 和 `Cutscene Subtitles`，其余都是 `"off"`；取值 `true` 合并双语 · `"off"` 原样不动 · `"sec_only"` 只留副语言）、`files`（例外清单，按包、按 FMG 单独设 `mode` / `enabled` / `separator`，优先级最高，如 `"files": {"menu_dlc2": {"fmg": {"地名.fmg": {"separator": " ~ "}, "アイテムうんちく.fmg": "sec_only"}}}`。
 
 分隔符：原本就带换行的固定用换行，不提供自定义；单行的默认用 ` / `，把 `separator` 改成 `" ~ "` 之类就跟着换。
 
@@ -74,7 +74,7 @@ No arguments is the default: it reads the bundled `source\` and writes the packs
 
 Arguments only when you need a different path or a partial rebuild: `--source` / `--out` (source and output folders), `--yabber` (Yabber outside the package), `--filter "menu*"` (rebuild matching packs only), `--keep-work` (keep intermediate files).
 
-Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (the separator inside one line, default `" / "`), `categories` (`true` merge both · `"off"` untouched · `"sec_only"` secondary language only), `files` (the exception list: per-pack, per-FMG `mode` / `enabled` / `separator`, highest priority, e.g. ` "files": {"menu_dlc2": {"fmg": {"地名.fmg": {"separator": " ~ "}, "アイテムうんちく.fmg": "sec_only"}}}`
+Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (the separator inside one line, default `" / "`), `categories` (only `Dialogue` and `Cutscene Subtitles` are on by default, the rest is `"off"`; `true` merge both · `"off"` untouched · `"sec_only"` secondary language only), `files` (the exception list: per-pack, per-FMG `mode` / `enabled` / `separator`, highest priority, e.g. ` "files": {"menu_dlc2": {"fmg": {"地名.fmg": {"separator": " ~ "}, "アイテムうんちく.fmg": "sec_only"}}}`
 
 Separators: text that already wraps keeps a newline and is not configurable; single-line text uses ` / ` by default, and `separator` changes it to something like `" ~ "`.
 
