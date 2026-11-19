@@ -51,9 +51,9 @@ python tools\dualsub.py
 
 要换路径或只重建一部分时才加参数：`--source` / `--out`（这一步的源和成品目录）、`--yabber`（Yabber 不在包内时）、`--filter "menu*"`（只重建匹配的包）、`--list`（导出分类模板到 `tools\dualsub.template.json`）、`--keep-work`（保留中间文件查错）。
 
-配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（默认换行）、`default_enabled`（没在 `categories` 里列出的类别是否合并）、`categories`（`true` 双语 · `"off"` 原样 · `"en_only"` 只留副语言 · `"append"` 强行追加）、`files`（按包、按 FMG 覆盖分隔符，如 `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
+配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（默认换行）、`default_enabled`（没在 `categories` 里列出的类别是否合并）、`keep_single`（极少数固定宽度标签保持单语，默认只有「等级」——中英并排会压住旁边的数值）、`categories`（`true` 双语 · `"off"` 原样 · `"en_only"` 只留副语言 · `"append"` 强行追加）、`files`（按包、按 FMG 覆盖分隔符，如 `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
 
-分隔符是自动的：对话、字幕、说明类用换行，名称、地名、按键提示、弹窗按钮用 ` / `。
+分隔符是自动的：对话、字幕、说明、地名用换行，名称、按键提示、弹窗按钮用 ` / `。地名走两行，是因为「结束游戏」那一栏的格子只够中文，一行塞两种语言会被切掉英文。
 
 ### 已知限制
 
@@ -109,9 +109,9 @@ No arguments is the default: it reads the bundled `source\` and writes the packs
 
 Arguments only when you need a different path or a partial rebuild: `--source` / `--out` (source and output folders), `--yabber` (Yabber outside the package), `--filter "menu*"` (rebuild matching packs only), `--list` (write the category template to `tools\dualsub.template.json`), `--keep-work` (keep intermediate files).
 
-Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (default newline), `default_enabled` (whether categories missing from `categories` get merged), `categories` (`true` bilingual · `"off"` untouched · `"en_only"` secondary language only · `"append"` force-append), `files` (per-pack, per-FMG separator override, e.g. `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
+Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (default newline), `default_enabled` (whether categories missing from `categories` get merged), `keep_single` (a few fixed-width labels stay single language; default `等级` only — putting both languages there covers the number beside it), `categories` (`true` bilingual · `"off"` untouched · `"en_only"` secondary language only · `"append"` force-append), `files` (per-pack, per-FMG separator override, e.g. `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
 
-The separator is chosen automatically: dialogue, subtitles and descriptions use a newline; names, place names, key prompts and popup buttons use ` / `.
+The separator is chosen automatically: dialogue, subtitles, descriptions and place names use a newline; names, key prompts and popup buttons use ` / `. Place names get their own line because the 地点 cell on the quit screen only has room for the Chinese half, and a single line gets the English clipped.
 
 ### Known limitations
 
