@@ -6,7 +6,6 @@ This repository ships no third-party code. Building the packs, and editing singl
 |---|---|---|---|---|
 | Yabber | Required. Unpacks and repacks `.msgbnd.dcx` / `.fmg` while rebuilding. | JKAnderson | GPL-3.0 | https://github.com/JKAnderson/Yabber |
 | WitchyBND | Optional. Unpacking one pack to edit entries by hand (README → Finer edits). | ividyon | GPL-3.0 | https://github.com/ividyon/WitchyBND |
-| SoulsFormats | The .NET library Yabber and WitchyBND are built on. Not used by this repository's own code. | JKAnderson | GPL-3.0 | https://github.com/JKAnderson/SoulsFormats |
 | UXM | Optional. Unpacking `Data*.bhd` / `.bdt` into the loose files the game reads. Archived upstream. | JKAnderson | GPL-3.0 | https://github.com/JKAnderson/UXM |
 | Nuxe | Optional. Same job as UXM, current alternative. | JKAnderson | GPL-3.0 | https://github.com/JKAnderson/Nuxe |
 | Python 3.9+ | Runs `tools/dualsub.py`. Standard library only, no third-party packages. | Python Software Foundation | PSF-2.0 | https://www.python.org |

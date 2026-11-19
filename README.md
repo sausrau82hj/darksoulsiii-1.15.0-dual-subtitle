@@ -128,8 +128,10 @@ The shipped packs replace whole files. A few widgets have fixed-size boxes — t
 
 ---
 
-### License
+## License / 许可证
 
 The MIT license in [LICENSE](LICENSE) covers only the Python scripts and the other original files written for this project — `tools/dualsub.py`, `tools/dualsub.config.json`, this README, the changelog. It does not cover the text packs under `msg/` and `source/` (modified FromSoftware / Bandai Namco game text, included for offline single-player modding, not for commercial use), nor the external tools listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Not affiliated with FromSoftware or Bandai Namco.
 
-Change history: [CHANGELOG.md](CHANGELOG.md).
+**中文**：[LICENSE](LICENSE) 里的 MIT 许可证只覆盖本项目原创的 Python 脚本和其他原创文件 —— `tools\dualsub.py`、`tools\dualsub.config.json`、本 README、CHANGELOG。它不覆盖 `msg/` 和 `source/` 下的文本包（属于修改过的 FromSoftware / Bandai Namco 游戏文本，仅供离线单人游戏 mod 使用，不得商用），也不覆盖 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) 里列出的第三方工具。与 FromSoftware、Bandai Namco 无关。
+
+改动记录 / Change history: [CHANGELOG.md](CHANGELOG.md).
