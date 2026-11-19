@@ -283,7 +283,7 @@ def _value_mode(v) -> str:
     if isinstance(v, dict):
         v = v.get("mode") if v.get("mode") else bool(v.get("enabled", True))
     if isinstance(v, str):
-        return "sec_only" if v.strip().lower() == "en_only" else v
+        return v.strip()
     return "append" if v else "off"
 
 
