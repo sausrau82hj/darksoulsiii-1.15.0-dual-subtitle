@@ -159,9 +159,9 @@ class FmgXml:
     def write(self) -> None:
         self.tree.write(self.path, xml_declaration=True, encoding="utf-8")
 
-    def merge(self, other: "FmgXml", sep, log) -> int:
+    def merge(self, other: "FmgXml", sep, log, inline: str = " / ") -> int:
         """Append every text of other behind self, and self behind other.
-        sep=None picks per entry: a newline when the source has one, otherwise ' / '
+        sep=None picks per entry: a newline when the source has one, otherwise `inline`
         (single-line widgets). Every entry is merged, short answers such as yes/no included.
         Returns the number of edits."""
         changed = 0
@@ -176,7 +176,7 @@ class FmgXml:
                 continue
             use_sep = sep
             if use_sep is None:
-                use_sep = "\n" if ("\n" in t1 or "\n" in t2) else " / "
+                use_sep = "\n" if ("\n" in t1 or "\n" in t2) else inline
             # Idempotent: entries that are already merged (A+sep+B / B+sep+A) are skipped, so a
             # rebuild never stacks the two languages twice
             if is_already_merged(t1, t2, use_sep):
@@ -189,7 +189,7 @@ class FmgXml:
         return changed
 
     def replace_texts_from(self, other: "FmgXml") -> int:
-        """en_only mode: replace the text of this file with the other language."""
+        """sec_only mode: replace the text of this file with the other language."""
         changed = 0
         for key, el in self.entries.items():
             other_el = other.entries.get(key)
@@ -225,8 +225,8 @@ def load_config(path: str) -> dict:
     if os.path.exists(path):
         with open(path, "r", encoding="utf-8") as fh:
             return json.load(fh)
-    return {"primary": "zhocn", "secondary": "engus", "separator": "\n",
-            "default_enabled": True, "categories": dict(DEFAULT_CATEGORIES)}
+    return {"primary": "zhocn", "secondary": "engus", "separator": " / ",
+            "categories": dict(DEFAULT_CATEGORIES)}
 
 
 # English category names -> internal FMG filename patterns (first match wins)
@@ -279,13 +279,11 @@ def _cat_value(cfg: dict, fmg: str):
 
 
 def _value_mode(v) -> str:
-    """Normalise a category value into a mode: append / off / en_only"""
+    """Normalise a category value into a mode: append / off / sec_only"""
     if isinstance(v, dict):
-        if v.get("mode"):
-            return str(v["mode"])
-        return "append" if v.get("enabled", True) else "off"
+        v = v.get("mode") if v.get("mode") else bool(v.get("enabled", True))
     if isinstance(v, str):
-        return v
+        return "sec_only" if v.strip().lower() == "en_only" else v
     return "append" if v else "off"
 
 
@@ -295,7 +293,7 @@ def enabled_for(cfg: dict, msgbnd: str, fmg: str) -> bool:
     for key in (msgbnd, stem_of(msgbnd)):
         if key in node:
             entry = node[key]
-            if not entry.get("enabled", cfg.get("default_enabled", True)):
+            if not entry.get("enabled", True):
                 return False
             rules = entry.get("fmg", {})
             for pat, val in rules.items():
@@ -306,21 +304,21 @@ def enabled_for(cfg: dict, msgbnd: str, fmg: str) -> bool:
     v = _cat_value(cfg, fmg)
     if v is not None:
         return _value_mode(v) != "off"
-    # Unlisted files fall back to the default; FMG-level rules apply globally
+    # Unlisted files are merged; FMG-level rules apply globally
     rules = cfg.get("fmg", {})
     for pat, val in rules.items():
         if fnmatch.fnmatchcase(fmg, pat):
             if isinstance(val, dict):
                 return bool(val.get("enabled", True))
             return bool(val)
-    return cfg.get("default_enabled", True)
+    return True
 
 
 def mode_for(cfg: dict, pack: str, fmg: str) -> str:
     """Merge modes:
       append  - append the other language (default)
       off     - do not merge (the default for long descriptions, which would not fit)
-      en_only - replace this language with English (for text you want to read in English)
+      sec_only - replace this language with the secondary one (English only)
     """
     # files/ wins over the category, so a single FMG can be handled differently
     entry = cfg.get("files", {}).get(stem_of(pack), {}).get("fmg", {})
@@ -358,33 +356,41 @@ def sep_value(v):
     return "\n" if v == "\\n" else v
 
 
-def separator_for(cfg: dict, pack: str, fmg: str) -> str:
-    """Pick the separator between the two languages: ' / ' for single-line widgets
-    (names / place names / prompts), a newline for multiline ones (dialogue and
-    descriptions). The config can override it per FMG."""
-    stem = stem_of(pack)
-    entry = cfg.get("files", {}).get(stem, {}).get("fmg", {})
-    v = entry.get(fmg)
-    if isinstance(v, dict) and "separator" in v:
-        return sep_value(v["separator"])
-    forced = sep_value(cfg.get("separator"))
-    if forced is not None:
-        return forced
+def inline_sep(cfg: dict) -> str:
+    """Separator between the two languages inside one line (default ' / ')."""
+    return sep_value(cfg.get("separator")) or " / "
+
+
+def separator_for(cfg: dict, pack: str, fmg: str):
+    """Separator for one FMG.
+
+    Widgets that already wrap text (dialogue, subtitles, descriptions, lore) always keep a
+    newline and are not configurable. Single-line widgets get the configured separator.
+    None means decide per entry: a newline when the source has one, otherwise that separator.
+    """
     base = os.path.splitext(fmg)[0]
     # Popup confirm windows: buttons are one line, message rows keep their own newline
     if base.startswith("FDP_ダイアログ"):
         return None
-    # Multiline widgets: dialogue / subtitles / long descriptions -> newline
+    # Multiline widgets: dialogue / subtitles / long descriptions -> always a newline
     multiline_marks = ("会話", "ムービー字幕", "説明", "うんちく", "ダイアログ")
     if any(m in base for m in multiline_marks):
         return "\n"
+    inline = inline_sep(cfg)
+    # Per-FMG override, for the widgets that sit on one line
+    entry = cfg.get("files", {}).get(stem_of(pack), {}).get("fmg", {})
+    v = entry.get(fmg)
+    if isinstance(v, dict) and "separator" in v:
+        forced = sep_value(v["separator"])
+        if forced is not None:
+            return forced
     # Single-line widgets: names / place names / menus / prompts -> one line
     one_line_marks = (
         "名.fmg", "地名", "一行ヘルプ", "キーガイド", "システムメッセージ",
         "メニューテキスト", "インゲームメニュー", "項目ヘルプ",
     )
     if any(m in base for m in one_line_marks) or base.endswith("名"):
-        return " / "
+        return inline
     # Everything else is decided per entry (short labels one line, long text a newline)
     return None
 
@@ -441,11 +447,11 @@ def build_one(game: str, out: str, cfg: dict, name: str, log, keep_work: bool,
         y.run(y.exe, p1)                       # fmg -> xml
         y.run(y.exe, p2)
         x1, x2 = FmgXml(p1 + ".xml"), FmgXml(p2 + ".xml")
-        if fmg_mode == "en_only":
+        if fmg_mode == "sec_only":
             n = x1.replace_texts_from(x2)
         else:
             fmg_sep = separator_for(cfg, name, fmg)
-            n = x1.merge(x2, fmg_sep, log)
+            n = x1.merge(x2, fmg_sep, log, inline_sep(cfg))
         if n:
             x1.write(); x2.write()
             y.run(y.exe, p1 + ".xml")          # xml -> fmg

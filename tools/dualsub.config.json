@@ -2,8 +2,7 @@
   "yabber_dir": "",
   "primary": "zhocn",
   "secondary": "engus",
-  "separator": "auto",
-  "default_enabled": true,
+  "separator": " / ",
   "categories": {
     "Dialogue": true,
     "Cutscene Subtitles": true,

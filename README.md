@@ -32,9 +32,9 @@ python tools\dualsub.py
 不带参数就是默认行为：拿包里的 `source\` 当源，成品写回包里的 `msg\`，跑完按上面第 2 步覆盖进游戏。
 要换路径或只重建一部分时才加参数：`--source` / `--out`（这一步的源和成品目录）、`--yabber`（Yabber 不在包内时）、`--filter "menu*"`（只重建匹配的包）、`--keep-work`（保留中间文件查错）。
 
-配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（默认 `"auto"` 自动挑；填具体字符串如 `" / "` 就全局强制）、`default_enabled`（没在 `categories` 里列出的类别是否合并）、`categories`（`true` 合并双语 · `"off"` 原样不动 · `"en_only"` 只留副语言，即只显示英文）、`files`（按包、按 FMG 覆盖，优先级高于 `categories`，可写 `mode` / `enabled` / `separator`，如 `{"menu_dlc2": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
+配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（单行文本的分隔符，默认 `" / "`）、`categories`（13 个类别加一个 `Other` 兜底，取值 `true` 合并双语 · `"off"` 原样不动 · `"sec_only"` 只留副语言，即只显示英文）、`files`（例外清单，按包、按 FMG 单独设 `mode` / `enabled` / `separator`，优先级最高，如 `{"menu_dlc2": {"fmg": {"地名.fmg": {"separator": " ~ "}}}}`）。
 
-分隔符默认自动：对话、字幕、说明、背景故事用换行，名称、地名、菜单、按键提示用 ` / `，剩下的逐条判断（原文带换行就用换行，否则 ` / `）。要固定就写 `separator`，全局或按 FMG 都行，填 `"auto"` 回到自动。
+分隔符：原本就带换行的（对话、字幕、说明、背景故事）固定用换行，不提供自定义；单行的（名称、地名、菜单、按键提示、帮助、系统消息）默认用 ` / `，把 `separator` 改成 `" ~ "` 之类就跟着换；弹窗确认键和剩下的小标签逐条判断 —— 原文带换行就换行，否则用单行分隔符。
 
 ### 已知限制
 
@@ -74,9 +74,9 @@ No arguments is the default: it reads the bundled `source\` and writes the packs
 
 Arguments only when you need a different path or a partial rebuild: `--source` / `--out` (source and output folders), `--yabber` (Yabber outside the package), `--filter "menu*"` (rebuild matching packs only), `--keep-work` (keep intermediate files).
 
-Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (default `"auto"`, picked per widget; any concrete string such as `" / "` forces it everywhere), `default_enabled` (whether categories missing from `categories` get merged), `categories` (`true` merge both · `"off"` untouched · `"en_only"` secondary language only, i.e. English), `files` (per-pack, per-FMG override, wins over `categories`; accepts `mode` / `enabled` / `separator`, e.g. `{"menu_dlc2": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
+Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (the separator inside one line, default `" / "`), `categories` (13 categories plus an `Other` catch-all; `true` merge both · `"off"` untouched · `"sec_only"` secondary language only, i.e. English), `files` (the exception list: per-pack, per-FMG `mode` / `enabled` / `separator`, highest priority, e.g. `{"menu_dlc2": {"fmg": {"地名.fmg": {"separator": " ~ "}}}}`).
 
-The separator is automatic by default: dialogue, subtitles, descriptions and lore use a newline; names, place names, menus and key prompts use ` / `; the rest is decided per entry (newline if the source text has one, otherwise ` / `). Override it with `separator`, globally or per FMG; `"auto"` goes back to the automatic choice.
+Separators: text that already wraps (dialogue, subtitles, descriptions, lore) keeps a newline and is not configurable; single-line text (names, place names, menus, key prompts, help, system messages) uses ` / ` by default, and `separator` changes it to something like `" ~ "`; popup confirm buttons and the remaining short labels are decided per entry — a newline if the source has one, otherwise the single-line separator.
 
 ### Known limitations
 
