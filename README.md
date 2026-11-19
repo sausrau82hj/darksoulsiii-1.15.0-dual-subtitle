@@ -57,7 +57,7 @@ Requires the loose-file setup (unpacked with UXM / Nuxe, so `Game\msg\` holds re
 
 ### Uninstall
 
-Replace the `msg` folder.The orignal folder: `...source/msg`.
+Replace the `msg` folder. The original folder: `...source/msg`.
 
 ### Rebuild
 
