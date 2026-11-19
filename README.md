@@ -8,7 +8,7 @@ DARK SOULS III 1.15.0
 
 ## 中文
 
-替换 `Game\msg\<语言>\` 下的 6 个文本包：`menu` / `menu_dlc1` / `menu_dlc2` / `item` / `item_dlc1` / `item_dlc2`（`.msgbnd.dcx`），游戏里能读到的文本全部中英双语。exe、params、存档都不动。
+替换 `Game\msg\<语言>\` 下的 4 个文本包：`menu_dlc1` / `menu_dlc2` / `item_dlc1` / `item_dlc2`（`.msgbnd.dcx`），游戏里能读到的文本全部中英双语。原版这 4 个包本身就是累积包 —— `*_dlc2` 里包含本体、DLC1、DLC2 的全部文本，本体没有单独的 `menu.msgbnd.dcx` / `item.msgbnd.dcx`。exe、params、存档都不动。
 
 ### 安装
 
@@ -69,7 +69,7 @@ python tools\dualsub.py
 
 ## English
 
-This replaces the 6 text packs under `Game\msg\<language>\`: `menu` / `menu_dlc1` / `menu_dlc2` / `item` / `item_dlc1` / `item_dlc2` (`.msgbnd.dcx`), so all in-game text is bilingual. Exe, params and saves are untouched.
+This replaces the 4 text packs under `Game\msg\<language>\`: `menu_dlc1` / `menu_dlc2` / `item_dlc1` / `item_dlc2` (`.msgbnd.dcx`), so all in-game text is bilingual. These packs are cumulative — `*_dlc2` already holds the base game, DLC1 and DLC2 text, and there is no standalone `menu.msgbnd.dcx` / `item.msgbnd.dcx` in the retail game. Exe, params and saves are untouched.
 
 ### Install
 

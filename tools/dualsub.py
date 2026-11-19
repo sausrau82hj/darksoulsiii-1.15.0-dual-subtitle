@@ -542,23 +542,6 @@ def main(argv=None) -> int:
         all_stats.append(build_one(src_game, args.out, cfg, name, print, args.keep_work, args.yabber))
         print()
 
-    # Base-game text files: without a loose copy the game falls back to the archived original
-    # of menu.msgbnd / item.msgbnd, so base-game text would not apply. Copy the result of the
-    # cumulative DLC2 (or DLC1) build under the base file name, for the packs that really
-    # merged something this run (a pack that merged nothing is not shipped).
-    built = {stem_of(s["file"]) for s in all_stats if s["entries"]}
-    for base in ("menu", "item"):
-        for lang in (primary, secondary):
-            for cand in (f"{base}_dlc2.msgbnd.dcx", f"{base}_dlc1.msgbnd.dcx"):
-                if stem_of(cand) not in built:
-                    continue
-                src = os.path.join(args.out, "msg", lang, cand)
-                if os.path.exists(src):
-                    dst = os.path.join(args.out, "msg", lang, f"{base}.msgbnd.dcx")
-                    shutil.copy2(src, dst)
-                    print(f"[base] {lang}\\{base}.msgbnd.dcx <- {cand}")
-                    break
-
     total_fmg = sum(s["fmg_merged"] for s in all_stats)
     total_entries = sum(s["entries"] for s in all_stats)
     print(f"Done: {len(all_stats)} packs, {total_fmg} FMGs, {total_entries} entries, "
