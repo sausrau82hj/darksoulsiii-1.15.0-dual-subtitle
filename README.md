@@ -6,7 +6,7 @@ DARK SOULS III 1.15.0 — 以中文显示时下方给出英文，以英文显示
 
 ## 中文
 
-只替换 6 个文本包（NPC 对话、过场字幕），`Game\msg\<语言>\menu.msgbnd.dcx / menu_dlc1 / menu_dlc2`。exe、params、存档、道具文本都不动。
+默认配置下替换 6 个文本包（NPC 对话、过场字幕），`Game\msg\<语言>\menu.msgbnd.dcx / menu_dlc1 / menu_dlc2`。exe、params、存档、道具文本都不动。
 
 ### 安装
 
@@ -15,8 +15,8 @@ DARK SOULS III 1.15.0 — 以中文显示时下方给出英文，以英文显示
 ```powershell
 $Game = "X:\Steam\steamapps\common\DARK SOULS III\Game"
 
-# 1) 备份原版（只做一次）
-robocopy "$Game\msg" "D:\ds3-msg-backup" menu*.dcx /S
+# 1) 备份原版（只做一次；menu*.dcx 是本次要换的，item*.dcx 给以后开道具文本留的）
+robocopy "$Game\msg" "D:\ds3-msg-backup" menu*.dcx item*.dcx /S
 
 # 2) 覆盖（在本仓库根目录执行）
 robocopy msg "$Game\msg" /E
@@ -26,7 +26,7 @@ robocopy msg "$Game\msg" /E
 
 ### 卸载
 
-把 `D:\ds3-msg-backup` 里的 6 个文件覆盖回 `$Game\msg\zhocn\` 和 `\engus\`。没备份就 Steam 验证完整性，或用 UXM / Nuxe 重新解包。
+把 `D:\ds3-msg-backup` 里 `zhocn\` 和 `engus\` 下的 `menu*.dcx` 覆盖回 `$Game\msg\` 对应目录（备份里还有 item 包，没装就不用管）。没备份就 Steam 验证完整性，或用 UXM / Nuxe 重新解包。
 
 ### 双语范围
 
@@ -36,7 +36,7 @@ robocopy msg "$Game\msg" /E
 | ムービー字幕（过场字幕） | **开** | 同上 |
 | 菜单、按键提示、道具名/说明/背景故事、地名、帮助、血字留言、系统消息、事件文本 | 关 | 保持原版单语 |
 
-要开别的类别，改 `tools\dualsub.config.json` 里的 `categories` 再重新生成。长说明类（道具说明、背景故事）面板放不下两种语言，建议设成 `"en_only"` 只看英文。
+要开别的类别，改 `tools\dualsub.config.json` 里的 `categories` 再重新生成。开了道具名/说明/背景故事，成品里就会多出 `item*.msgbnd.dcx`，照第 2 步一起覆盖即可（上面备份已经把 item 包一起备下）。长说明类（道具说明、背景故事）面板放不下两种语言，建议设成 `"en_only"` 只看英文。
 
 ### 重新生成
 
@@ -72,7 +72,7 @@ python tools\dualsub.py --out . --source source --yabber "D:\Tools\Yabber 1.3.1"
 
 ## English
 
-Replaces 6 text packs only — NPC dialogue and cutscene subtitles — `Game\msg\<language>\menu.msgbnd.dcx / menu_dlc1 / menu_dlc2`. Exe, params, saves and item text are untouched.
+With the default config this replaces 6 text packs — NPC dialogue and cutscene subtitles — `Game\msg\<language>\menu.msgbnd.dcx / menu_dlc1 / menu_dlc2`. Exe, params, saves and item text are untouched.
 
 ### Install
 
@@ -81,8 +81,8 @@ Requires the loose-file setup (unpacked with UXM / Nuxe, so `Game\msg\` holds re
 ```powershell
 $Game = "X:\Steam\steamapps\common\DARK SOULS III\Game"
 
-# 1) back up the originals (once)
-robocopy "$Game\msg" "D:\ds3-msg-backup" menu*.dcx /S
+# 1) back up the originals (once; menu*.dcx is what gets replaced now, item*.dcx for enabling item text later)
+robocopy "$Game\msg" "D:\ds3-msg-backup" menu*.dcx item*.dcx /S
 
 # 2) overwrite (run from this repository's root)
 robocopy msg "$Game\msg" /E
@@ -92,7 +92,7 @@ Start the game offline afterwards. Game updates and Steam "verify integrity" ove
 
 ### Uninstall
 
-Copy the 6 files from `D:\ds3-msg-backup` back into `$Game\msg\zhocn\` and `\engus\`. No backup? Use Steam's verify integrity, or re-unpack with UXM / Nuxe.
+Copy the `menu*.dcx` files from `D:\ds3-msg-backup\zhocn\` and `\engus\` back into the matching `$Game\msg\` folders (the backup also holds the item packs — ignore them if you never installed them). No backup? Use Steam's verify integrity, or re-unpack with UXM / Nuxe.
 
 ### What is bilingual
 
@@ -102,7 +102,7 @@ Copy the 6 files from `D:\ds3-msg-backup` back into `$Game\msg\zhocn\` and `\eng
 | ムービー字幕 (cutscene subtitles) | **on** | same |
 | Menus, key prompts, item names/descriptions/lore, place names, help text, blood messages, system messages, event text | off | vanilla single language |
 
-Turn more on under `categories` in `tools\dualsub.config.json` and rebuild. Long description panels cannot fit both languages — set those to `"en_only"` to read the English instead.
+Turn more on under `categories` in `tools\dualsub.config.json` and rebuild: enabling item names/descriptions/lore also produces `item*.msgbnd.dcx`, which you then copy over with step 2 (the backup above already covers the item packs). Long description panels cannot fit both languages — set those to `"en_only"` to read the English instead.
 
 ### Rebuild
 
