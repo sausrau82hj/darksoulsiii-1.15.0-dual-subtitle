@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Dark Souls III 双语字幕文本工具 (中文主语言 + 英文副语言，双向)。
+"""Dark Souls III dual-language text tool (default: Chinese primary, English secondary).
 
-工作方式（UXM 松散文件环境）:
-  1. 从 <game>/msg/<lang>/*.msgbnd.dcx 取出文本包 (zhocn + engus)
-  2. 用 Yabber 解 DCX -> BND4 -> FMG，得到 <lang>/msg/<LANG>/64bit/*.fmg
-  3. 按条目 id 把两种语言的文本合并成「中文\\n英文」，并同时写回两个语言槽
-     （游戏显示中文时下方出现英文；显示英文时下方出现中文）
-  4. 按配置的开关决定哪些 FMG（地图大字/对话/物品/菜单/教程...）参与合并
-  5. 重新打包回 .msgbnd.dcx，输出到 mod 目录，供 UXM 松散文件加载
+How it works (UXM loose-file setup):
+  1. read the text packs from <game>/msg/<lang>/*.msgbnd.dcx (zhocn + engus)
+  2. unpack DCX -> BND4 -> FMG with Yabber, giving <lang>/msg/<LANG>/64bit/*.fmg
+  3. merge both languages entry by entry into "Chinese\\nEnglish" and write it into both
+     language slots (the Chinese client shows English underneath, and vice versa)
+  4. the config decides which FMGs (area titles / dialogue / items / menus / tutorials ...)
+     take part
+  5. repack into .msgbnd.dcx into the mod folder for UXM loose-file loading
 
-用法:
-  python dualsub.py --list                        # 导出分类配置模板
-  python dualsub.py                               # 按配置生成全部
-  python dualsub.py --filter menu_dlc1            # 只处理某个文本包（调试）
-  python dualsub.py --game "D:\\...\\Game" --out "D:\\game\\dark souls3\\mod\\DualSubtitle"
+Usage:
+  python dualsub.py --list                        # write the category template
+  python dualsub.py                               # build everything from the config
+  python dualsub.py --filter menu_dlc1            # only one pack (debugging)
+  python dualsub.py --game "D:\\...\\Game" --out <folder>
 """
 from __future__ import annotations
 
@@ -32,9 +33,11 @@ import xml.etree.ElementTree as ET
 
 YABBER_DIR = os.environ.get("YABBER_DIR", "")
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-# 包根目录：脚本放在 <包>/tools/ 下时就是包的根目录，成品默认写回 <包>/msg/
+# Package root: when the script lives in <package>/tools/ this is the package root,
+# and the output defaults to <package>/msg/
 PACK_ROOT = os.path.dirname(SCRIPT_DIR) if os.path.basename(SCRIPT_DIR).lower() == "tools" else SCRIPT_DIR
-# 默认输出到脚本所在目录下的 DualSubtitle/（只有单独搬运脚本、没有 source/ 时才用）
+# Default output is DualSubtitle/ next to the script (only used when the script was moved
+# out on its own and has no source/ next to it)
 DEFAULT_OUT = os.path.join(SCRIPT_DIR, "DualSubtitle")
 DEFAULT_CONFIG = os.path.join(SCRIPT_DIR, "dualsub.config.json")
 
@@ -50,7 +53,7 @@ YABBER_HELP = (
 
 
 def find_yabber(hint: str = "") -> str:
-    """定位 Yabber 目录（必须同时有 Yabber.exe 和 Yabber.DCX.exe）。"""
+    """Locate the Yabber folder (must hold both Yabber.exe and Yabber.DCX.exe)."""
     cands = []
     if hint:
         cands.append(hint)
@@ -59,8 +62,8 @@ def find_yabber(hint: str = "") -> str:
     exe = shutil.which("Yabber.exe") or shutil.which("Yabber")
     if exe:
         cands.append(os.path.dirname(os.path.abspath(exe)))
-    # 先找包内：<包>\Yabber*、<包>\tools\Yabber*、<包>\<任意子目录>\Yabber.exe
-    # （用户把 Yabber 解压到包根目录即可，不用配路径）
+    # Look inside the package first: <package>\Yabber*, <package>\tools\Yabber*,
+    # <package>\<any subfolder>\Yabber.exe (extracting Yabber into the package root is enough)
     roots = [
         PACK_ROOT, os.path.join(PACK_ROOT, "tools"),
         r"D:\game\TOOL", r"D:\Tools", r"D:\tool", r"C:\Tools", r"C:\tool",
@@ -80,7 +83,7 @@ def find_yabber(hint: str = "") -> str:
 
 
 def default_game() -> str:
-    """自动定位 DS3 的 Game 目录（环境变量 -> Steam 库 -> 常见路径）。"""
+    """Locate the DS3 Game folder (environment variable -> Steam library -> usual paths)."""
     env = os.environ.get("DS3_GAME_DIR", "")
     if env and os.path.isfile(os.path.join(env, "DarkSoulsIII.exe")):
         return env
@@ -107,7 +110,7 @@ def default_game() -> str:
 
 NULL_MARKERS = {"%null%", "null", ""}
 
-# 各类文本的中文说明（用于配置文件和 --list 输出）
+# Human-readable name of each text category (used by the config file and --list)
 CATEGORY_HINT = {
     "ダイアログ": "对话（通用对话框）",
     "会話": "NPC 对话字幕",
@@ -144,13 +147,14 @@ def is_null(t) -> bool:
 
 
 def is_already_merged(t1: str, t2: str, sep: str) -> bool:
-    """判断这对文本是否已经合并过（形如 A+sep+B / B+sep+A），重复构建时跳过。"""
+    """True when this text pair is already merged (A+sep+B / B+sep+A), so a rebuild skips it."""
     if not sep:
         return False
     if t1.endswith(sep + t2) or t2.endswith(sep + t1):
         return True
     a, b = t1.split(sep), t2.split(sep)
-    # 合并后的两份文本是「同一批片段、顺序相反」；多行文本会拆成 3 段以上，所以比较排序后的片段集合
+    # The merged pair holds the same fragments in opposite order; multiline text splits into
+    # three or more pieces, so compare the sorted fragment sets
     return len(a) > 1 and len(b) > 1 and sorted(a) == sorted(b)
 
 
@@ -170,7 +174,7 @@ class Yabber:
 
 
 class FmgXml:
-    """FMG 的 Yabber XML: <fmg><entries><text id="...">��文</text>..."""
+    """Yabber XML of an FMG: <fmg><entries><text id=\"...\">text</text>..."""
 
     def __init__(self, path: str):
         self.path = path
@@ -187,10 +191,10 @@ class FmgXml:
         self.tree.write(self.path, xml_declaration=True, encoding="utf-8")
 
     def merge(self, other: "FmgXml", sep, log, skip_texts=None) -> int:
-        """把 other 的文本追加到 self 的每条后面，并把 self 的文本追加到 other。
-        sep 为 None 时按条目自动选择：原文含换行用换行，否则用 ' / '（单行控件）。
-        skip_texts 中的原文（精确匹配）不合并，避免窄按钮/标签被截断。
-        返回修改条数。"""
+        """Append every text of other behind self, and self behind other.
+        sep=None picks per entry: a newline when the source has one, otherwise ' / '
+        (single-line widgets). Texts listed in skip_texts (exact match) are not merged, so
+        narrow buttons and labels are never truncated. Returns the number of edits."""
         changed = 0
         skip_texts = skip_texts or ()
         for key, el in self.entries.items():
@@ -207,7 +211,8 @@ class FmgXml:
             use_sep = sep
             if use_sep is None:
                 use_sep = "\n" if ("\n" in t1 or "\n" in t2) else " / "
-            # 幂等：已经合并过（A+分隔符+B / B+分隔符+A）的条目跳过，重复构建不会叠加两次
+            # Idempotent: entries that are already merged (A+sep+B / B+sep+A) are skipped, so a
+            # rebuild never stacks the two languages twice
             if is_already_merged(t1, t2, use_sep):
                 continue
             new1, new2 = t1 + use_sep + t2, t2 + use_sep + t1
@@ -218,7 +223,7 @@ class FmgXml:
         return changed
 
     def replace_texts_from(self, other: "FmgXml") -> int:
-        """en_only 模式：用另一种语言的文本替换本文件中的文本。"""
+        """en_only mode: replace the text of this file with the other language."""
         changed = 0
         for key, el in self.entries.items():
             other_el = other.entries.get(key)
@@ -226,7 +231,8 @@ class FmgXml:
                 continue
             if is_null(other_el.text):
                 continue
-            # 本语言是空的（%null%）时也要填上副语言，否则玩家看到的还是空白
+            # Fill in the secondary language even when this language is empty (%null%), otherwise the
+            # player still sees a blank line
             if not is_null(el.text) and norm(el.text) == norm(other_el.text):
                 continue
             el.text = other_el.text
@@ -333,7 +339,7 @@ def _cat_value(cfg: dict, fmg: str):
 
 
 def _value_mode(v) -> str:
-    """把分类的值统一成模式: append / off / en_only"""
+    """Normalise a category value into a mode: append / off / en_only"""
     if isinstance(v, dict):
         if v.get("mode"):
             return str(v["mode"])
@@ -359,7 +365,7 @@ def enabled_for(cfg: dict, msgbnd: str, fmg: str) -> bool:
                     if isinstance(val, dict):
                         return bool(val.get("enabled", True))
                     return bool(val)
-    # 未配置的文件走默认；FMG 级规则全局生效
+    # Unlisted files fall back to the default; FMG-level rules apply globally
     rules = cfg.get("fmg", {})
     for pat, val in rules.items():
         if fnmatch.fnmatchcase(fmg, pat):
@@ -370,10 +376,10 @@ def enabled_for(cfg: dict, msgbnd: str, fmg: str) -> bool:
 
 
 def mode_for(cfg: dict, pack: str, fmg: str) -> str:
-    """合并模式:
-      append  - 追加另一种语言（默认）
-      off     - 不合并（长说明默认，避免框内显示不全）
-      en_only - 用英文替换当前语言的文本（适合想读英文原文的说明）
+    """Merge modes:
+      append  - append the other language (default)
+      off     - do not merge (the default for long descriptions, which would not fit)
+      en_only - replace this language with English (for text you want to read in English)
     """
     v = _cat_value(cfg, fmg)
     if v is not None:
@@ -389,7 +395,7 @@ def mode_for(cfg: dict, pack: str, fmg: str) -> str:
 
 
 def discover(game: str, primary: str, secondary: str) -> list[str]:
-    """两种语言都有、且能配对处理的文本包。"""
+    """Text packs that exist in both languages and can be paired."""
     a = os.path.join(game, "msg", primary)
     b = os.path.join(game, "msg", secondary)
     if not os.path.isdir(a) or not os.path.isdir(b):
@@ -400,26 +406,27 @@ def discover(game: str, primary: str, secondary: str) -> list[str]:
 
 
 def separator_for(cfg: dict, pack: str, fmg: str) -> str:
-    """决定两种语言之间的分隔符。单行控件（名称/地名/提示）用 ' / '，
-    多行控件（对话字幕/说明）用换行。配置文件可对单个 FMG 覆盖。"""
+    """Pick the separator between the two languages: ' / ' for single-line widgets
+    (names / place names / prompts), a newline for multiline ones (dialogue and
+    descriptions). The config can override it per FMG."""
     stem = stem_of(pack)
     entry = cfg.get("files", {}).get(stem, {}).get("fmg", {})
     v = entry.get(fmg)
     if isinstance(v, dict) and v.get("separator") is not None:
         return v["separator"]
     base = os.path.splitext(fmg)[0]
-    # 多行控件：对话/字幕/长说明 -> 换行
+    # Multiline widgets: dialogue / subtitles / long descriptions -> newline
     multiline_marks = ("会話", "ムービー字幕", "説明", "うんちく", "ダイアログ")
     if any(m in base for m in multiline_marks):
         return "\n"
-    # 单行控件：名称/地名/菜单/提示 -> 同一行
+    # Single-line widgets: names / place names / menus / prompts -> one line
     one_line_marks = (
         "名.fmg", "地名", "一行ヘルプ", "キーガイド", "システムメッセージ",
         "メニューテキスト", "インゲームメニュー", "項目ヘルプ",
     )
     if any(m in base for m in one_line_marks) or base.endswith("名"):
         return " / "
-    # 其余按条目自动判断（短标签单行，长文本换行）
+    # Everything else is decided per entry (short labels one line, long text a newline)
     return None
 
 
@@ -495,7 +502,7 @@ def build_one(game: str, out: str, cfg: dict, name: str, log, keep_work: bool,
             log(f"  = {fmg}: nothing to merge")
 
     if not stats["entries"]:
-        # 一个条目都没合并 → 这个包与原版相同，装进去只会多一份风险，直接跳过
+        # Nothing merged -> the pack is identical to vanilla, so shipping it only adds risk: skip it
         log(f"  = nothing merged in {name}, not installed")
         if not keep_work:
             shutil.rmtree(work, ignore_errors=True)
@@ -516,7 +523,7 @@ def build_one(game: str, out: str, cfg: dict, name: str, log, keep_work: bool,
 
 
 def do_list(cfg_path: str, primary: str, secondary: str) -> None:
-    """写一份分类配置模板（不需要游戏目录，也不需要日文文件名）。"""
+    """Write a category template (needs no game folder and no Japanese file names)."""
     template = {
         "primary": primary,
         "secondary": secondary,
@@ -545,7 +552,7 @@ def main(argv=None) -> int:
     ap.add_argument("--list", action="store_true", help="导出分类配置模板（默认 tools/dualsub.template.json）")
     ap.add_argument("--keep-work", action="store_true", help="保留中间文件")
     args = ap.parse_args(argv)
-    # 不带任何参数运行（例如在资源管理器里双击 .py）时，结束后停一下好让窗口留着
+    # When run with no arguments (e.g. double-clicked in Explorer) keep the window open at the end
     interactive = not (argv if argv is not None else sys.argv[1:])
 
     cfg = load_config(args.config)
@@ -556,13 +563,13 @@ def main(argv=None) -> int:
     primary, secondary = cfg.get("primary", "zhocn"), cfg.get("secondary", "engus")
 
     if args.list:
-        # 只是导出模板，不需要游戏目录；默认别覆盖正在用的配置
+        # Template export only: no game folder needed, and the active config is not overwritten by default
         if os.path.abspath(args.config) == os.path.abspath(DEFAULT_CONFIG):
             args.config = os.path.join(os.path.dirname(DEFAULT_CONFIG), "dualsub.template.json")
         do_list(args.config, primary, secondary)
         return 0
 
-    # 包内自带 source\ 时默认就地重建：用 source\ 当源，成品写回包里的 msg\
+    # With a bundled source\ the default is an in-place rebuild: read source\, write <package>/msg\
     pack_src = os.path.join(PACK_ROOT, "source")
     use_pack_src = args.source is None and os.path.isdir(os.path.join(pack_src, "msg"))
     src_game = (pack_src if use_pack_src else None) or args.source or args.game or default_game()
@@ -575,7 +582,7 @@ def main(argv=None) -> int:
         print(f"输出到本包 / writing to {args.out}")
 
     names = discover(src_game, primary, secondary)
-    # ngword 是屏蔽词表，不参与双语显示
+    # ngword holds the profanity list and never takes part in the dual-language display
     names = [n for n in names if not stem_of(n).lower().startswith("ngword")]
     if args.filter:
         names = [n for n in names if fnmatch.fnmatchcase(stem_of(n), args.filter)]
@@ -592,9 +599,10 @@ def main(argv=None) -> int:
         all_stats.append(build_one(src_game, args.out, cfg, name, print, args.keep_work, args.yabber))
         print()
 
-    # 本体文本文件: 游戏读 menu.msgbnd / item.msgbnd 时若没有松散副本会回退到归档原版，
-    # 导致本体文本不生效。用累积版 DLC2（没有则 DLC1）的生成结果补一份本体文件名。
-    # 只给本次真的合并过内容的包补（没合并过的包不装）。
+    # Base-game text files: without a loose copy the game falls back to the archived original
+    # of menu.msgbnd / item.msgbnd, so base-game text would not apply. Copy the result of the
+    # cumulative DLC2 (or DLC1) build under the base file name, for the packs that really
+    # merged something this run (a pack that merged nothing is not shipped).
     built = {stem_of(s["file"]) for s in all_stats if s["entries"]}
     for base in ("menu", "item"):
         for lang in (primary, secondary):
