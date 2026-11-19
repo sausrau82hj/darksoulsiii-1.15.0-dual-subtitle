@@ -2,7 +2,68 @@
 
 DARK SOULS III 1.15.0
 
-[English](#english) · [中文](#中文)
+[中文](#中文) · [English](#english)
+
+---
+
+## 中文
+
+默认配置下替换 6 个文本包（NPC 对话、过场字幕），`Game\msg\<语言>\menu.msgbnd.dcx / menu_dlc1 / menu_dlc2`。exe、params、存档、道具文本都不动。
+
+### 安装
+
+前提：游戏用 UXM / Nuxe 解包过（`Game\msg\` 里是散文件），并且已关闭。
+
+```powershell
+$Game = "X:\Steam\steamapps\common\DARK SOULS III\Game"
+
+# 1) 备份原版（只做一次；menu*.dcx 是本次要换的，item*.dcx 给以后开道具文本留的）
+robocopy "$Game\msg" "D:\ds3-msg-backup" menu*.dcx item*.dcx /S
+
+# 2) 覆盖（在本仓库根目录执行）
+robocopy msg "$Game\msg" /E
+```
+
+装完离线启动游戏。游戏更新或 Steam「验证文件完整性」会冲掉，重跑第 2 步即可（备份不用重做）。
+
+### 卸载
+
+把 `D:\ds3-msg-backup` 里 `zhocn\` 和 `engus\` 下的 `menu*.dcx` 覆盖回 `$Game\msg\` 对应目录（备份里还有 item 包，没装就不用管）。没备份就 Steam 验证完整性，或用 UXM / Nuxe 重新解包。
+
+### 双语范围
+
+| 文本 | 默认 | 说明 |
+|---|---|---|
+| 会話（NPC 对话） | **开** | 逐条合并，副语言为空的条目保持原样 |
+| ムービー字幕（过场字幕） | **开** | 同上 |
+| 菜单、按键提示、道具名/说明/背景故事、地名、帮助、血字留言、系统消息、事件文本 | 关 | 保持原版单语 |
+
+要开别的类别，改 `tools\dualsub.config.json` 里的 `categories` 再重新生成。开了道具名/说明/背景故事，成品里就会多出 `item*.msgbnd.dcx`，照第 2 步一起覆盖即可（上面备份已经把 item 包一起备下）。长说明类（道具说明、背景故事）面板放不下两种语言，建议设成 `"en_only"` 只看英文。
+
+### 重新生成
+
+需要 **Python 3.9+** 和 [Yabber](https://github.com/JKAnderson/Yabber/releases)。包里不放 .bat / .ps1，只有一条命令：
+
+1. 把 Yabber 解压到本包根目录，例如 `DualSubtitle\Yabber 1.3.1\`（脚本自己会找到，不用配路径）。
+2. 在包根目录执行：
+
+```
+python tools\dualsub.py
+```
+
+不带参数就是默认行为：拿包里的 `source\` 当源，成品写回包里的 `msg\`，跑完按上面第 2 步覆盖进游戏。`source\` 里是原版文本包，所以重复生成不会把双语内容再合并一次。
+
+要换路径或只重建一部分时才加参数：`--source` / `--out`（这一步的源和成品目录）、`--yabber`（Yabber 不在包内时）、`--filter "menu*"`（只重建匹配的包）、`--list`（导出分类模板到 `tools\dualsub.template.json`）、`--keep-work`（保留中间文件查错）。
+
+配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（默认换行）、`default_enabled`（没在 `categories` 里列出的类别是否合并）、`skip_merge_texts`（永不合并的短词，如 是/否/确定/取消 —— 中英两种写法都列了，主副对调时照样生效）、`categories`（`true` 双语 · `"off"` 原样 · `"en_only"` 只留副语言 · `"append"` 强行追加）、`files`（按包、按 FMG 覆盖分隔符，如 `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
+
+分隔符是自动的：对话、字幕、说明类用换行，名称、地名、按键提示用 ` / `。
+
+### 已知限制
+
+- 只改文本。别的 mod 也换 `msg` 时，把那个 mod 的文件放进 `source\` 再生成。
+- 如果只启用了部分类别，没合并到内容的包不会被生成，游戏继续读原版的那几个包。
+- 同一句话中文一行、英文可能折成两三行，个别对话会顶到对话框下沿。
 
 ---
 
@@ -70,64 +131,3 @@ The separator is chosen automatically: dialogue, subtitles and descriptions use 
 ### License
 
 Scripts: MIT — see [LICENSE](LICENSE). The generated text is modified FromSoftware / Bandai Namco game text, included for offline single-player modding, not for commercial use. Not affiliated with FromSoftware or Bandai Namco.
-
----
-
-## 中文
-
-默认配置下替换 6 个文本包（NPC 对话、过场字幕），`Game\msg\<语言>\menu.msgbnd.dcx / menu_dlc1 / menu_dlc2`。exe、params、存档、道具文本都不动。
-
-### 安装
-
-前提：游戏用 UXM / Nuxe 解包过（`Game\msg\` 里是散文件），并且已关闭。
-
-```powershell
-$Game = "X:\Steam\steamapps\common\DARK SOULS III\Game"
-
-# 1) 备份原版（只做一次；menu*.dcx 是本次要换的，item*.dcx 给以后开道具文本留的）
-robocopy "$Game\msg" "D:\ds3-msg-backup" menu*.dcx item*.dcx /S
-
-# 2) 覆盖（在本仓库根目录执行）
-robocopy msg "$Game\msg" /E
-```
-
-装完离线启动游戏。游戏更新或 Steam「验证文件完整性」会冲掉，重跑第 2 步即可（备份不用重做）。
-
-### 卸载
-
-把 `D:\ds3-msg-backup` 里 `zhocn\` 和 `engus\` 下的 `menu*.dcx` 覆盖回 `$Game\msg\` 对应目录（备份里还有 item 包，没装就不用管）。没备份就 Steam 验证完整性，或用 UXM / Nuxe 重新解包。
-
-### 双语范围
-
-| 文本 | 默认 | 说明 |
-|---|---|---|
-| 会話（NPC 对话） | **开** | 逐条合并，副语言为空的条目保持原样 |
-| ムービー字幕（过场字幕） | **开** | 同上 |
-| 菜单、按键提示、道具名/说明/背景故事、地名、帮助、血字留言、系统消息、事件文本 | 关 | 保持原版单语 |
-
-要开别的类别，改 `tools\dualsub.config.json` 里的 `categories` 再重新生成。开了道具名/说明/背景故事，成品里就会多出 `item*.msgbnd.dcx`，照第 2 步一起覆盖即可（上面备份已经把 item 包一起备下）。长说明类（道具说明、背景故事）面板放不下两种语言，建议设成 `"en_only"` 只看英文。
-
-### 重新生成
-
-需要 **Python 3.9+** 和 [Yabber](https://github.com/JKAnderson/Yabber/releases)。包里不放 .bat / .ps1，只有一条命令：
-
-1. 把 Yabber 解压到本包根目录，例如 `DualSubtitle\Yabber 1.3.1\`（脚本自己会找到，不用配路径）。
-2. 在包根目录执行：
-
-```
-python tools\dualsub.py
-```
-
-不带参数就是默认行为：拿包里的 `source\` 当源，成品写回包里的 `msg\`，跑完按上面第 2 步覆盖进游戏。`source\` 里是原版文本包，所以重复生成不会把双语内容再合并一次。
-
-要换路径或只重建一部分时才加参数：`--source` / `--out`（这一步的源和成品目录）、`--yabber`（Yabber 不在包内时）、`--filter "menu*"`（只重建匹配的包）、`--list`（导出分类模板到 `tools\dualsub.template.json`）、`--keep-work`（保留中间文件查错）。
-
-配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（默认换行）、`default_enabled`（没在 `categories` 里列出的类别是否合并）、`skip_merge_texts`（永不合并的短词，如 是/否/确定/取消 —— 中英两种写法都列了，主副对调时照样生效）、`categories`（`true` 双语 · `"off"` 原样 · `"en_only"` 只留副语言 · `"append"` 强行追加）、`files`（按包、按 FMG 覆盖分隔符，如 `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
-
-分隔符是自动的：对话、字幕、说明类用换行，名称、地名、按键提示用 ` / `。
-
-### 已知限制
-
-- 只改文本。别的 mod 也换 `msg` 时，把那个 mod 的文件放进 `source\` 再生成。
-- 如果只启用了部分类别，没合并到内容的包不会被生成，游戏继续读原版的那几个包。
-- 同一句话中文一行、英文可能折成两三行，个别对话会顶到对话框下沿。
