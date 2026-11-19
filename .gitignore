@@ -8,3 +8,5 @@ __pycache__/
 
 # --list 默认导出的配置模板
 tools/dualsub.template.json
+# Yabber 解压到包内也照样能找到，但不进仓库
+Yabber*/

@@ -31,17 +31,20 @@ import time
 import xml.etree.ElementTree as ET
 
 YABBER_DIR = os.environ.get("YABBER_DIR", "")
-# 默认输出到脚本所在目录下的 DualSubtitle/。以前这里写死成作者本机的
-# "D:\game\dark souls3\mod\DualSubtitle"，别人不带 --out 跑就直接写到一个不存在的路径。
-DEFAULT_OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "DualSubtitle")
-DEFAULT_CONFIG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "dualsub.config.json")
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+# 包根目录：脚本放在 <包>/tools/ 下时就是包的根目录，成品默认写回 <包>/msg/
+PACK_ROOT = os.path.dirname(SCRIPT_DIR) if os.path.basename(SCRIPT_DIR).lower() == "tools" else SCRIPT_DIR
+# 默认输出到脚本所在目录下的 DualSubtitle/（只有单独搬运脚本、没有 source/ 时才用）
+DEFAULT_OUT = os.path.join(SCRIPT_DIR, "DualSubtitle")
+DEFAULT_CONFIG = os.path.join(SCRIPT_DIR, "dualsub.config.json")
 
 YABBER_HELP = (
     "Yabber 未找到 / Yabber not found.\n"
-    "  用 --yabber 参数、config 里的 \"yabber_dir\"、或 YABBER_DIR 环境变量指向\n"
+    "  把 Yabber 解压到本包根目录（如 DualSubtitle\\Yabber 1.3.1\\）再运行，\n"
+    "  或用 --yabber 参数、config 里的 \"yabber_dir\"、或 YABBER_DIR 环境变量指向\n"
     "  同时含 Yabber.exe 与 Yabber.DCX.exe 的文件夹。\n"
-    "  Pass --yabber <dir>, set \"yabber_dir\" in the config, or set the YABBER_DIR\n"
-    "  environment variable to the folder holding Yabber.exe and Yabber.DCX.exe.\n"
+    "  Extract Yabber anywhere under this package's root folder, or pass --yabber <dir>,\n"
+    "  set \"yabber_dir\" in the config, or set the YABBER_DIR environment variable.\n"
     "  Download: https://github.com/JKAnderson/Yabber/releases"
 )
 
@@ -56,7 +59,10 @@ def find_yabber(hint: str = "") -> str:
     exe = shutil.which("Yabber.exe") or shutil.which("Yabber")
     if exe:
         cands.append(os.path.dirname(os.path.abspath(exe)))
+    # 先找包内：<包>\Yabber*、<包>\tools\Yabber*、<包>\<任意子目录>\Yabber.exe
+    # （用户把 Yabber 解压到包根目录即可，不用配路径）
     roots = [
+        PACK_ROOT, os.path.join(PACK_ROOT, "tools"),
         r"D:\game\TOOL", r"D:\Tools", r"D:\tool", r"C:\Tools", r"C:\tool",
         os.environ.get("LOCALAPPDATA", ""), os.path.expanduser("~\\Downloads"),
         os.path.expanduser("~"),
@@ -539,6 +545,8 @@ def main(argv=None) -> int:
     ap.add_argument("--list", action="store_true", help="导出分类配置模板（默认 tools/dualsub.template.json）")
     ap.add_argument("--keep-work", action="store_true", help="保留中间文件")
     args = ap.parse_args(argv)
+    # 不带任何参数运行（例如在资源管理器里双击 .py）时，结束后停一下好让窗口留着
+    interactive = not (argv if argv is not None else sys.argv[1:])
 
     cfg = load_config(args.config)
     if args.primary:
@@ -554,14 +562,17 @@ def main(argv=None) -> int:
         do_list(args.config, primary, secondary)
         return 0
 
-    src_game = args.source or args.game or default_game()
+    # 包内自带 source\ 时默认就地重建：用 source\ 当源，成品写回包里的 msg\
+    pack_src = os.path.join(PACK_ROOT, "source")
+    use_pack_src = args.source is None and os.path.isdir(os.path.join(pack_src, "msg"))
+    src_game = (pack_src if use_pack_src else None) or args.source or args.game or default_game()
     if not os.path.isdir(src_game):
         raise SystemExit(f"Text pack directory not found: {src_game}\n"
-                         "用 --source 指向本包的 source 目录，或用 --game 指定 {游戏}\\Game 目录。")
+                         "用 --source 指向本包的 source 目录，或用 --game 指定 {游戏}\Game 目录。")
 
     if not args.out:
-        args.out = DEFAULT_OUT
-        print(f"未指定 --out，输出到脚本目录 / no --out given, writing to {args.out}")
+        args.out = PACK_ROOT if use_pack_src else DEFAULT_OUT
+        print(f"输出到本包 / writing to {args.out}")
 
     names = discover(src_game, primary, secondary)
     # ngword 是屏蔽词表，不参与双语显示
@@ -602,6 +613,11 @@ def main(argv=None) -> int:
     print(f"Done: {len(all_stats)} packs, {total_fmg} FMGs, {total_entries} entries, "
           f"in {time.time() - t0:.1f}s")
     print(f"Mod files in: {args.out}")
+    if interactive and sys.stdin is not None and sys.stdin.isatty():
+        try:
+            input("\n按回车退出 / press Enter to close")
+        except EOFError:
+            pass
     return 0
 
 

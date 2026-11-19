@@ -40,23 +40,18 @@ robocopy msg "$Game\msg" /E
 
 ### 重新生成
 
-需要 Python 3.9+ 和 [Yabber](https://github.com/JKAnderson/Yabber/releases)（解压即可）。
+需要 **Python 3.9+** 和 [Yabber](https://github.com/JKAnderson/Yabber/releases)。包里不放 .bat / .ps1，只有一条命令：
+
+1. 把 Yabber 解压到本包根目录，例如 `DualSubtitle\Yabber 1.3.1\`（脚本自己会找到，不用配路径）。
+2. 在包根目录执行：
 
 ```
-python tools\dualsub.py --out . --source source --yabber "D:\Tools\Yabber 1.3.1"
+python tools\dualsub.py
 ```
 
-`--out .` 把结果写回本目录的 `msg\`，然后按上面第 2 步覆盖进游戏。`source\` 里是原版文本包，所以重复生成不会把双语内容再合并一次；只有删掉 `source\` 转去读游戏目录时，才需要先还原原版。
+不带参数就是默认行为：拿包里的 `source\` 当源，成品写回包里的 `msg\`，跑完按上面第 2 步覆盖进游戏。`source\` 里是原版文本包，所以重复生成不会把双语内容再合并一次。
 
-| 参数 | 作用 |
-|---|---|
-| `--out` | 输出目录，成品写在 `<out>\msg\<语言>\`；省略则写到 `tools\DualSubtitle\` |
-| `--source` | 原版文本包目录（本包是 `source`）；省略则读 `--game` 指向的游戏目录 |
-| `--game` | 游戏 `Game` 目录，自动定位失败时才需要 |
-| `--yabber` | Yabber 目录（含 `Yabber.exe` 与 `Yabber.DCX.exe`）；也可写在配置的 `yabber_dir` 或用环境变量 `YABBER_DIR` |
-| `--filter` | 只重建匹配的包，如 `--filter "menu*"` |
-| `--list` | 导出一份分类配置模板到 `tools\dualsub.template.json`（不会覆盖正在用的配置） |
-| `--keep-work` | 保留中间文件，方便查错 |
+要换路径或只重建一部分时才加参数：`--source` / `--out`（这一步的源和成品目录）、`--yabber`（Yabber 不在包内时）、`--filter "menu*"`（只重建匹配的包）、`--list`（导出分类模板到 `tools\dualsub.template.json`）、`--keep-work`（保留中间文件查错）。
 
 配置项：`primary` / `secondary`（默认 `zhocn` / `engus`）、`separator`（默认换行）、`default_enabled`、`skip_merge_texts`（永不合并的短词）、`categories`（`true` 双语 · `"off"` 原样 · `"en_only"` 只换英文 · `"append"` 强行追加）、`files`（按包、按 FMG 覆盖分隔符，如 `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
 
@@ -106,23 +101,18 @@ Turn more on under `categories` in `tools\dualsub.config.json` and rebuild: enab
 
 ### Rebuild
 
-Requires **Python 3.9+** and [Yabber](https://github.com/JKAnderson/Yabber/releases) (just extract it).
+Requires **Python 3.9+** and [Yabber](https://github.com/JKAnderson/Yabber/releases). The package ships no .bat / .ps1 — one command does it:
+
+1. Extract Yabber anywhere under the package root, e.g. `DualSubtitle\Yabber 1.3.1\` (the script finds it, no path to configure).
+2. From the package root:
 
 ```
-python tools\dualsub.py --out . --source source --yabber "D:\Tools\Yabber 1.3.1"
+python tools\dualsub.py
 ```
 
-`--out .` writes the result back into this folder's `msg\`; then install with step 2 above. `source\` holds the vanilla packs, so rebuilding never merges already-bilingual text twice — only if you delete `source\` and read the game folder instead do you need to restore the originals first.
+No arguments is the default: it reads the bundled `source\` and writes the packs back into the package's `msg\`; then install with step 2 above. `source\` holds the vanilla packs, so rebuilding never merges already-bilingual text twice.
 
-| Argument | Meaning |
-|---|---|
-| `--out` | output folder, results land in `<out>\msg\<language>\`; defaults to `tools\DualSubtitle\` |
-| `--source` | folder with the vanilla packs (here: `source`); defaults to the game folder given by `--game` |
-| `--game` | the game's `Game` folder — only needed when auto-detection fails |
-| `--yabber` | folder holding `Yabber.exe` and `Yabber.DCX.exe`; alternatively `yabber_dir` in the config or the `YABBER_DIR` environment variable |
-| `--filter` | rebuild only matching packs, e.g. `--filter "menu*"` |
-| `--list` | write a category template to `tools\dualsub.template.json` (never overwrites your live config) |
-| `--keep-work` | keep intermediate files for debugging |
+Arguments only when you need a different path or a partial rebuild: `--source` / `--out` (source and output folders), `--yabber` (Yabber outside the package), `--filter "menu*"` (rebuild matching packs only), `--list` (write the category template to `tools\dualsub.template.json`), `--keep-work` (keep intermediate files).
 
 Config keys: `primary` / `secondary` (default `zhocn` / `engus`), `separator` (default newline), `default_enabled`, `skip_merge_texts` (short strings never merged), `categories` (`true` bilingual · `"off"` untouched · `"en_only"` English only · `"append"` force-append), `files` (per-pack, per-FMG separator override, e.g. `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
 
