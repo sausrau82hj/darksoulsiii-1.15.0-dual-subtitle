@@ -74,7 +74,7 @@ No arguments is the default: it reads the bundled `source\` and writes the packs
 
 Arguments only when you need a different path or a partial rebuild: `--source` / `--out` (source and output folders), `--yabber` (Yabber outside the package), `--filter "menu*"` (rebuild matching packs only), `--list` (write the category template to `tools\dualsub.template.json`), `--keep-work` (keep intermediate files).
 
-Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (default newline), `default_enabled` (whether categories missing from `categories` get merged), `categories` (`true` bilingual · `"off"` untouched · `"en_only"` secondary language only · `"append"` force-append), `files` (per-pack, per-FMG separator override, e.g. `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
+Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (default newline), `default_enabled` (whether categories missing from `categories` get merged), `categories` (`true` bilingual · `"off"` untouched · `"sec_only"` secondary language only · `"append"` force-append), `files` (per-pack, per-FMG separator override, e.g. `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
 
 The separator is chosen automatically: dialogue, subtitles and descriptions use a newline; names, place names and key prompts use ` / `.
 
