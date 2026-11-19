@@ -28,7 +28,6 @@ import shutil
 import subprocess
 import sys
 import time
-import traceback
 import xml.etree.ElementTree as ET
 
 YABBER_DIR = os.environ.get("YABBER_DIR", "")
@@ -404,7 +403,7 @@ def build_one(game: str, out: str, cfg: dict, name: str, log, keep_work: bool,
         shutil.rmtree(work)
     os.makedirs(work, exist_ok=True)
 
-    y = Yabber(yabber_dir)
+    y = Yabber(yabber_dir or cfg.get("yabber_dir") or find_yabber())
     stats = {"file": name, "fmg_total": 0, "fmg_merged": 0, "entries": 0, "skipped_fmg": 0}
 
     results = {}  # lang -> final dcx path
@@ -525,26 +524,15 @@ def main(argv=None) -> int:
     if not names:
         raise SystemExit("No text packs to process (base text may not be unpacked)")
 
-    # Resolve Yabber once, before any pack is touched, so a missing install fails immediately
-    # with a message the user can act on instead of a half-built folder
-    yabber_dir = args.yabber or cfg.get("yabber_dir") or find_yabber()
-    Yabber(yabber_dir)          # validate the two exes now, not on the first pack
-
     t0 = time.time()
     print(f"Source: {src_game}")
     print(f"Output: {args.out}")
-    print(f"Yabber: {yabber_dir}")
     print(f"Languages: {primary} + {secondary}, {len(names)} packs\n")
     all_stats = []
     for name in names:
         print(f"[{name}]")
-        all_stats.append(build_one(src_game, args.out, cfg, name, print, args.keep_work, yabber_dir))
+        all_stats.append(build_one(src_game, args.out, cfg, name, print, args.keep_work, args.yabber))
         print()
-
-    # Drop the scratch folder when the run left it empty, so the package stays clean
-    work_root = os.path.join(args.out, "_work")
-    if os.path.isdir(work_root) and not os.listdir(work_root):
-        os.rmdir(work_root)
 
     total_fmg = sum(s["fmg_merged"] for s in all_stats)
     total_entries = sum(s["entries"] for s in all_stats)
@@ -559,28 +547,5 @@ def main(argv=None) -> int:
     return 0
 
 
-def _pause() -> None:
-    """Keep a double-clicked console window open so the message can be read."""
-    if sys.stdin is not None and sys.stdin.isatty():
-        try:
-            input("\nPress Enter to close")
-        except EOFError:
-            pass
-
-
 if __name__ == "__main__":
-    try:
-        code = main()
-    except SystemExit as exc:
-        # Expected failure (missing Yabber, wrong folder ...): print the message and hold the window
-        code = exc.code if isinstance(exc.code, int) and exc.code else 1
-        if isinstance(exc.code, str):
-            print(exc.code, file=sys.stderr)
-        if not sys.argv[1:]:
-            _pause()
-    except Exception:
-        traceback.print_exc()
-        code = 1
-        if not sys.argv[1:]:
-            _pause()
-    sys.exit(code)
+    sys.exit(main())
