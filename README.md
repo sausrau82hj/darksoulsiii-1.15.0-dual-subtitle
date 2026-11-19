@@ -20,16 +20,17 @@ DARK SOULS III 1.15.0
 
 ### 重新生成
 
-需要 **Python 3.9+** 和 [Yabber](https://github.com/JKAnderson/Yabber/releases)。
+需要 **Python 3.9+**。发布包里已经带了 Yabber 1.3.1（就在包根目录），不用另外下载。
 
-1. 把 Yabber 解压到本包根目录，例如 `DualSubtitle\Yabber 1.3.1\`（脚本自己会找到，不用配路径）。
-2. 在包根目录执行：
+1. 在包根目录执行：
 
 ```
 python tools\dualsub.py
 ```
 
-不带参数就是默认行为：拿包里的 `source\` 当源，成品写回包里的 `msg\`，跑完按上面第 2 步覆盖进游戏。
+Yabber 文件夹被删掉、或者换了位置时，把它解压回包根目录就行（如 `Yabber 1.3.1\`），脚本自己会找到，不用配路径。
+
+不带参数就是默认行为：拿包里的 `source\` 当源，成品写回包里的 `msg\`，跑完按上面「安装」那两步覆盖进游戏。
 要换路径或只重建一部分时才加参数：`--source` / `--out`（这一步的源和成品目录）、`--yabber`（Yabber 不在包内时）、`--filter "menu*"`（只重建匹配的包）、`--keep-work`（保留中间文件查错）。
 
 配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（单行文本的分隔符，默认 `" / "`）、`categories`（取值 `true` 合并双语 · `"off"` 原样不动 · `"sec_only"` 只留副语言）、`files`（例外清单，按包、按 FMG 单独设 `mode` / `enabled` / `separator`，优先级最高，如 `"files": {"menu_dlc2": {"fmg": {"地名.fmg": {"separator": " ~ "}, "アイテムうんちく.fmg": "sec_only"}}}`。
@@ -61,16 +62,17 @@ Replace the `msg` folder.The orignal folder: `...source/msg`.
 
 ### Rebuild
 
-Requires **Python 3.9+** and [Yabber](https://github.com/JKAnderson/Yabber/releases). 
+Requires **Python 3.9+**. The release zip already includes [Yabber](https://github.com/JKAnderson/Yabber/releases) 1.3.1 in the package root, so there is nothing extra to download.
 
-1. Extract Yabber anywhere under the package root, e.g. `DualSubtitle\Yabber 1.3.1\` (the script finds it, no path to configure).
-2. From the package root:
+1. From the package root:
 
 ```
 python tools\dualsub.py
 ```
 
-No arguments is the default: it reads the bundled `source\` and writes the packs back into the package's `msg\`; then install with step 2 above. 
+If the Yabber folder was deleted or moved, extract it back under the package root (e.g. `Yabber 1.3.1\`) — the script finds it, no path to configure.
+
+No arguments is the default: it reads the bundled `source\` and writes the packs back into the package's `msg\`; then install as described under Install above. 
 
 Arguments only when you need a different path or a partial rebuild: `--source` / `--out` (source and output folders), `--yabber` (Yabber outside the package), `--filter "menu*"` (rebuild matching packs only), `--keep-work` (keep intermediate files).
 
