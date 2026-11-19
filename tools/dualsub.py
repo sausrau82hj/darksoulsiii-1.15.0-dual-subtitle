@@ -420,12 +420,12 @@ def separator_for(cfg: dict, pack: str, fmg: str) -> str:
     if base.startswith("FDP_ダイアログ"):
         return None
     # Multiline widgets: dialogue / subtitles / long descriptions -> newline
-    multiline_marks = ("会話", "ムービー字幕", "説明", "うんちく", "ダイアログ", "地名")
+    multiline_marks = ("会話", "ムービー字幕", "説明", "うんちく", "ダイアログ")
     if any(m in base for m in multiline_marks):
         return "\n"
     # Single-line widgets: names / place names / menus / prompts -> one line
     one_line_marks = (
-        "名.fmg", "一行ヘルプ", "キーガイド", "システムメッセージ",
+        "名.fmg", "地名", "一行ヘルプ", "キーガイド", "システムメッセージ",
         "メニューテキスト", "インゲームメニュー", "項目ヘルプ",
     )
     if any(m in base for m in one_line_marks) or base.endswith("名"):

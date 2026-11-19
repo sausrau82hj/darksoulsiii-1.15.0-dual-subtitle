@@ -4,9 +4,7 @@
   "secondary": "engus",
   "separator": "\n",
   "default_enabled": true,
-  "keep_single": [
-    "等级"
-  ],
+  "keep_single": [],
   "categories": {
     "Dialogue": true,
     "Cutscene Subtitles": true,

@@ -51,9 +51,9 @@ python tools\dualsub.py
 
 要换路径或只重建一部分时才加参数：`--source` / `--out`（这一步的源和成品目录）、`--yabber`（Yabber 不在包内时）、`--filter "menu*"`（只重建匹配的包）、`--list`（导出分类模板到 `tools\dualsub.template.json`）、`--keep-work`（保留中间文件查错）。
 
-配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（默认换行）、`default_enabled`（没在 `categories` 里列出的类别是否合并）、`keep_single`（极少数固定宽度标签保持单语，默认只有「等级」——中英并排会压住旁边的数值）、`categories`（`true` 双语 · `"off"` 原样 · `"en_only"` 只留副语言 · `"append"` 强行追加）、`files`（按包、按 FMG 覆盖分隔符，如 `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
+配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（默认换行）、`default_enabled`（没在 `categories` 里列出的类别是否合并）、`keep_single`（可选，默认空：把某个词填进去就保持单语，例如固定宽度标签 `["等级"]`）、`categories`（`true` 双语 · `"off"` 原样 · `"en_only"` 只留副语言 · `"append"` 强行追加）、`files`（按包、按 FMG 覆盖分隔符，如 `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
 
-分隔符是自动的：对话、字幕、说明、地名用换行，名称、按键提示、弹窗按钮用 ` / `。地名走两行，是因为「结束游戏」那一栏的格子只够中文，一行塞两种语言会被切掉英文。
+分隔符是自动的：对话、字幕、说明用换行，名称、地名、按键提示、弹窗按钮用 ` / `。
 
 ### 已知限制
 
@@ -61,6 +61,7 @@ python tools\dualsub.py
 - 如果只启用了部分类别，没合并到内容的包不会被生成，游戏继续读原版的那几个包。
 - 同一句话中文一行、英文可能折成两三行，个别对话会顶到对话框下沿；菜单标签和道具说明也一样会变长，个别会被截掉。
 - 道具说明/背景故事的面板高度是固定的，中英两段放不下，底部会被切掉 —— 在意就把这两类设成 `"en_only"`。
+- 「结束游戏」/角色选择界面的三行写死在 `menu\05_010_profileselect.gfx` 的窄文本框里（地点值约 147px、等级标签约 50px，都只有一行）：「等级 / Level」会压到右边的数字，地点只显示得出中文。位置和宽度不在文本包里，改不了；在意就在 `keep_single` 里填 `"等级"`，或把 `Place Names` 设成 `"off"`。
 
 ---
 
@@ -109,9 +110,9 @@ No arguments is the default: it reads the bundled `source\` and writes the packs
 
 Arguments only when you need a different path or a partial rebuild: `--source` / `--out` (source and output folders), `--yabber` (Yabber outside the package), `--filter "menu*"` (rebuild matching packs only), `--list` (write the category template to `tools\dualsub.template.json`), `--keep-work` (keep intermediate files).
 
-Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (default newline), `default_enabled` (whether categories missing from `categories` get merged), `keep_single` (a few fixed-width labels stay single language; default `等级` only — putting both languages there covers the number beside it), `categories` (`true` bilingual · `"off"` untouched · `"en_only"` secondary language only · `"append"` force-append), `files` (per-pack, per-FMG separator override, e.g. `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
+Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (default newline), `default_enabled` (whether categories missing from `categories` get merged), `keep_single` (optional, empty by default: list a word to keep it single language, e.g. `["等级"]` for a fixed-width label), `categories` (`true` bilingual · `"off"` untouched · `"en_only"` secondary language only · `"append"` force-append), `files` (per-pack, per-FMG separator override, e.g. `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
 
-The separator is chosen automatically: dialogue, subtitles, descriptions and place names use a newline; names, key prompts and popup buttons use ` / `. Place names get their own line because the 地点 cell on the quit screen only has room for the Chinese half, and a single line gets the English clipped.
+The separator is chosen automatically: dialogue, subtitles and descriptions use a newline; names, place names, key prompts and popup buttons use ` / `.
 
 ### Known limitations
 
@@ -119,6 +120,7 @@ The separator is chosen automatically: dialogue, subtitles, descriptions and pla
 - Packs where nothing gets merged are not generated, so the game keeps reading the vanilla copies of those.
 - A Chinese line plus an English one that wraps to two lines can sit tight against the bottom of the dialogue box; menu labels and item text grow the same way and some get clipped.
 - The item description / lore panel has a fixed height and cannot fit both languages — the bottom is cut off. Set those two categories to `"en_only"` if that bothers you.
+- The three rows on the quit / profile screen live in narrow single-line text fields inside `menu\05_010_profileselect.gfx` (place value ~147px, level label ~50px): `等级 / Level` covers the number to its right and the place name only shows the Chinese half. Position and width are not part of the text packs, so they cannot be changed here; add `"等级"` to `keep_single` or set `Place Names` to `"off"` if it bothers you.
 
 ---
 
