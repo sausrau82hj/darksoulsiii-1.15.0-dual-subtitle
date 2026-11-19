@@ -16,7 +16,7 @@ DARK SOULS III 1.15.0
 
 ### 卸载
 
-替换 `msg` 文件夹，原文件夹: ...source/msg.
+替换 `msg` 文件夹，原文件夹: `...source/msg`。
 
 ### 重新生成
 
@@ -57,7 +57,7 @@ Requires the loose-file setup (unpacked with UXM / Nuxe, so `Game\msg\` holds re
 
 ### Uninstall
 
-Replace the `msg` folder.The orignal folder: ...source/msg.
+Replace the `msg` folder.The orignal folder: `...source/msg`.
 
 ### Rebuild
 
