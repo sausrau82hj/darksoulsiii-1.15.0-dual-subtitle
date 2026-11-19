@@ -11,8 +11,8 @@ DARK SOULS III 1.15.0
 ### 安装
 
 前提：游戏用 UXM / Nuxe 解包过（`Game\msg\` 里是散文件），并且已关闭。
-1.替换 `msg` 文件夹。
-2.离线启动游戏。
+1. 替换 `msg` 文件夹。
+2. 离线启动游戏。
 
 ### 卸载
 
@@ -52,8 +52,8 @@ python tools\dualsub.py
 ### Install
 
 Requires the loose-file setup (unpacked with UXM / Nuxe, so `Game\msg\` holds real files) and the game closed.
-1.Replace the `msg` folder.
-2.Start the game offline afterwards.
+1. Replace the `msg` folder.
+2. Start the game offline afterwards.
 
 ### Uninstall
 
