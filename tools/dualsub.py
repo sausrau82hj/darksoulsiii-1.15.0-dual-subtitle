@@ -190,14 +190,12 @@ class FmgXml:
     def write(self) -> None:
         self.tree.write(self.path, xml_declaration=True, encoding="utf-8")
 
-    def merge(self, other: "FmgXml", sep, log, keep_single=()) -> int:
+    def merge(self, other: "FmgXml", sep, log) -> int:
         """Append every text of other behind self, and self behind other.
         sep=None picks per entry: a newline when the source has one, otherwise ' / '
-        (single-line widgets). Every entry is merged, short answers such as 是/否 included;
-        keep_single only holds labels that sit in a fixed-width cell and would overlap the
-        value next to them. Returns the number of edits."""
+        (single-line widgets). Every entry is merged, short answers such as 是/否 included.
+        Returns the number of edits."""
         changed = 0
-        keep = {t.strip() for t in keep_single}
         for key, el in self.entries.items():
             other_el = other.entries.get(key)
             if other_el is None:
@@ -206,8 +204,6 @@ class FmgXml:
             if is_null(t1) or is_null(t2):
                 continue
             if norm(t1) == norm(t2):
-                continue
-            if keep and (t1.strip() in keep or t2.strip() in keep):
                 continue
             use_sep = sep
             if use_sep is None:
@@ -440,7 +436,6 @@ def build_one(game: str, out: str, cfg: dict, name: str, log, keep_work: bool,
     sep = cfg.get("separator", "\n")
     if sep == "\\n":
         sep = "\n"
-    keep_single = cfg.get("keep_single", [])
     stem = stem_of(name)
     work = os.path.join(out, "_work", stem)
     if os.path.isdir(work):
@@ -494,7 +489,7 @@ def build_one(game: str, out: str, cfg: dict, name: str, log, keep_work: bool,
             n = x1.replace_texts_from(x2)
         else:
             fmg_sep = separator_for(cfg, name, fmg)
-            n = x1.merge(x2, fmg_sep, log, keep_single)
+            n = x1.merge(x2, fmg_sep, log)
         if n:
             x1.write(); x2.write()
             y.run(y.exe, p1 + ".xml")          # xml -> fmg

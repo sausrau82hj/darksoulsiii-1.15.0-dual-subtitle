@@ -4,7 +4,6 @@
   "secondary": "engus",
   "separator": "\n",
   "default_enabled": true,
-  "keep_single": [],
   "categories": {
     "Dialogue": true,
     "Cutscene Subtitles": true,

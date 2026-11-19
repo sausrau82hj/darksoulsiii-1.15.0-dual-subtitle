@@ -8,7 +8,7 @@ DARK SOULS III 1.15.0
 
 ## 中文
 
-替换 `Game\msg\<语言>\` 下的 6 个文本包：`menu` / `menu_dlc1` / `menu_dlc2` / `item` / `item_dlc1` / `item_dlc2`（`.msgbnd.dcx`）。游戏里能读到的文本全部中英双语。exe、params、存档都不动。
+替换 `Game\msg\<语言>\` 下的 6 个文本包：`menu` / `menu_dlc1` / `menu_dlc2` / `item` / `item_dlc1` / `item_dlc2`（`.msgbnd.dcx`），游戏里能读到的文本全部中英双语。exe、params、存档都不动。
 
 ### 安装
 
@@ -32,9 +32,9 @@ robocopy msg "$Game\msg" /E
 
 ### 双语范围
 
-`tools\dualsub.config.json` 里所有类别都开着，六个包里能配上的条目全部双语：NPC 对话、过场字幕、事件文本、弹窗确认按钮、菜单、按键提示和一行帮助、系统消息、地名、道具名/说明/背景故事、血字留言。**逐条合并，不按词跳过** —— `是` / `否` / `确定` / `取消` 也照样带上另一语言。
+`tools\dualsub.config.json` 里所有类别都开着：NPC 对话、过场字幕、事件文本、弹窗确认按钮、菜单、按键提示、帮助文本、系统消息、地名、道具名/说明/背景故事、血字留言。逐条合并，不按词跳过 —— `是` / `否` / `确定` / `取消` 也照样带上另一语言。
 
-不想让某一类双语，把它设成 `"off"`；长说明面板塞不下两种语言时可设成 `"en_only"` 只看英文。改完执行下面的重新生成。
+不想让某一类双语，把它设成 `"off"`；长说明类（道具说明、背景故事）面板放不下两种语言，可设成 `"en_only"` 只看英文。改完重新生成即可。
 
 ### 重新生成
 
@@ -51,23 +51,25 @@ python tools\dualsub.py
 
 要换路径或只重建一部分时才加参数：`--source` / `--out`（这一步的源和成品目录）、`--yabber`（Yabber 不在包内时）、`--filter "menu*"`（只重建匹配的包）、`--list`（导出分类模板到 `tools\dualsub.template.json`）、`--keep-work`（保留中间文件查错）。
 
-配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（默认换行）、`default_enabled`（没在 `categories` 里列出的类别是否合并）、`keep_single`（可选，默认空：把某个词填进去就保持单语，例如固定宽度标签 `["等级"]`）、`categories`（`true` 双语 · `"off"` 原样 · `"en_only"` 只留副语言 · `"append"` 强行追加）、`files`（按包、按 FMG 覆盖分隔符，如 `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
+配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（默认换行）、`default_enabled`（没在 `categories` 里列出的类别是否合并）、`categories`（`true` 双语 · `"off"` 原样 · `"en_only"` 只留副语言 · `"append"` 强行追加）、`files`（按包、按 FMG 覆盖分隔符，如 `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
 
-分隔符是自动的：对话、字幕、说明用换行，名称、地名、按键提示、弹窗按钮用 ` / `。
+分隔符是自动的：对话、字幕、说明类用换行，名称、地名、按键提示用 ` / `。
 
 ### 已知限制
 
 - 只改文本。别的 mod 也换 `msg` 时，把那个 mod 的文件放进 `source\` 再生成。
 - 如果只启用了部分类别，没合并到内容的包不会被生成，游戏继续读原版的那几个包。
-- 同一句话中文一行、英文可能折成两三行，个别对话会顶到对话框下沿；菜单标签和道具说明也一样会变长，个别会被截掉。
-- 道具说明/背景故事的面板高度是固定的，中英两段放不下，底部会被切掉 —— 在意就把这两类设成 `"en_only"`。
-- 「结束游戏」/角色选择界面的三行写死在 `menu\05_010_profileselect.gfx` 的窄文本框里（地点值约 147px、等级标签约 50px，都只有一行）：「等级 / Level」会压到右边的数字，地点只显示得出中文。位置和宽度不在文本包里，改不了；在意就在 `keep_single` 里填 `"等级"`，或把 `Place Names` 设成 `"off"`。
+- 同一句话中文一行、英文可能折成两三行，个别对话会顶到对话框下沿。
+
+### 更精细的修改
+
+成品是整包替换。个别界面的框子是写死的（比如角色选择那栏的地点、等级，以及道具说明面板），两种语言塞进去会挤到一起或被切掉。想逐条取舍，用 [WitchyBND](https://github.com/ividyon/WitchyBND/releases) 解包：直接把 `msg\zhocn\` 里的 `.msgbnd.dcx` 拖上去，会拆成一个个 `.fmg`；再对 `.fmg` 跑一次，得到可读的 `.xml`。改完按原路径反向跑一遍封回去，覆盖进游戏的 `Game\msg\` 即可。
 
 ---
 
 ## English
 
-This replaces the 6 text packs under `Game\msg\<language>\`: `menu` / `menu_dlc1` / `menu_dlc2` / `item` / `item_dlc1` / `item_dlc2` (`.msgbnd.dcx`). All in-game text is bilingual. Exe, params and saves are untouched.
+This replaces the 6 text packs under `Game\msg\<language>\`: `menu` / `menu_dlc1` / `menu_dlc2` / `item` / `item_dlc1` / `item_dlc2` (`.msgbnd.dcx`), so all in-game text is bilingual. Exe, params and saves are untouched.
 
 ### Install
 
@@ -91,9 +93,9 @@ Copy the `menu*.dcx` and `item*.dcx` files from `D:\ds3-msg-backup\zhocn\` and `
 
 ### What is bilingual
 
-Every category in `tools\dualsub.config.json` is on, so every entry that pairs up in those six packs is bilingual: NPC dialogue, cutscene subtitles, event text, popup confirm buttons, menus, key prompts and one-line help, system messages, place names, item names/descriptions/lore, blood messages. **Nothing is skipped by word** — short answers like `是` / `否` / `确定` / `取消` carry the other language too.
+Every category in `tools\dualsub.config.json` is on: NPC dialogue, cutscene subtitles, event text, popup confirm buttons, menus, key prompts, help text, system messages, place names, item names/descriptions/lore, blood messages. Merged entry by entry, nothing skipped by word — short answers like `是` / `否` / `确定` / `取消` carry the other language too.
 
-Put a category at `"off"` if you do not want it bilingual; use `"en_only"` for panels that cannot fit both languages. Then rebuild below.
+Put a category at `"off"` if you do not want it bilingual; long description panels cannot fit both languages, so `"en_only"` is there to read the English instead. Then rebuild.
 
 ### Rebuild
 
@@ -110,17 +112,19 @@ No arguments is the default: it reads the bundled `source\` and writes the packs
 
 Arguments only when you need a different path or a partial rebuild: `--source` / `--out` (source and output folders), `--yabber` (Yabber outside the package), `--filter "menu*"` (rebuild matching packs only), `--list` (write the category template to `tools\dualsub.template.json`), `--keep-work` (keep intermediate files).
 
-Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (default newline), `default_enabled` (whether categories missing from `categories` get merged), `keep_single` (optional, empty by default: list a word to keep it single language, e.g. `["等级"]` for a fixed-width label), `categories` (`true` bilingual · `"off"` untouched · `"en_only"` secondary language only · `"append"` force-append), `files` (per-pack, per-FMG separator override, e.g. `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
+Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (default newline), `default_enabled` (whether categories missing from `categories` get merged), `categories` (`true` bilingual · `"off"` untouched · `"en_only"` secondary language only · `"append"` force-append), `files` (per-pack, per-FMG separator override, e.g. `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
 
-The separator is chosen automatically: dialogue, subtitles and descriptions use a newline; names, place names, key prompts and popup buttons use ` / `.
+The separator is chosen automatically: dialogue, subtitles and descriptions use a newline; names, place names and key prompts use ` / `.
 
 ### Known limitations
 
 - Text only. If another mod also replaces `msg` files, drop that mod's files into `source\` and rebuild.
 - Packs where nothing gets merged are not generated, so the game keeps reading the vanilla copies of those.
-- A Chinese line plus an English one that wraps to two lines can sit tight against the bottom of the dialogue box; menu labels and item text grow the same way and some get clipped.
-- The item description / lore panel has a fixed height and cannot fit both languages — the bottom is cut off. Set those two categories to `"en_only"` if that bothers you.
-- The three rows on the quit / profile screen live in narrow single-line text fields inside `menu\05_010_profileselect.gfx` (place value ~147px, level label ~50px): `等级 / Level` covers the number to its right and the place name only shows the Chinese half. Position and width are not part of the text packs, so they cannot be changed here; add `"等级"` to `keep_single` or set `Place Names` to `"off"` if it bothers you.
+- A Chinese line plus an English one that wraps to two lines can sit tight against the bottom of the dialogue box.
+
+### Finer edits
+
+The shipped packs replace whole files. A few widgets have fixed-size boxes — the location and level rows on the character screen, the item description panel — so both languages can crowd together or get clipped there. To pick entries by hand, unpack with [WitchyBND](https://github.com/ividyon/WitchyBND/releases): drop a `.msgbnd.dcx` from `msg\engus\` on it and it splits into the individual `.fmg` files; run it again on a `.fmg` to get readable `.xml`. Edit, run it once more to pack the file back, then copy the packs into the game's `Game\msg\`.
 
 ---
 
