@@ -8,7 +8,7 @@ DARK SOULS III 1.15.0
 
 ## 中文
 
-默认配置下替换 6 个文本包（NPC 对话、过场字幕），`Game\msg\<语言>\menu.msgbnd.dcx / menu_dlc1 / menu_dlc2`。exe、params、存档、道具文本都不动。
+替换 `Game\msg\<语言>\` 下的 6 个文本包：`menu` / `menu_dlc1` / `menu_dlc2` / `item` / `item_dlc1` / `item_dlc2`（`.msgbnd.dcx`）。游戏里能读到的文本全部中英双语。exe、params、存档都不动。
 
 ### 安装
 
@@ -17,7 +17,7 @@ DARK SOULS III 1.15.0
 ```powershell
 $Game = "X:\Steam\steamapps\common\DARK SOULS III\Game"
 
-# 1) 备份原版（只做一次；menu*.dcx 是本次要换的，item*.dcx 给以后开道具文本留的）
+# 1) 备份原版（只做一次；menu*.dcx 和 item*.dcx 都会被替换）
 robocopy "$Game\msg" "D:\ds3-msg-backup" menu*.dcx item*.dcx /S
 
 # 2) 覆盖（在本仓库根目录执行）
@@ -28,19 +28,13 @@ robocopy msg "$Game\msg" /E
 
 ### 卸载
 
-把 `D:\ds3-msg-backup` 里 `zhocn\` 和 `engus\` 下的 `menu*.dcx` 覆盖回 `$Game\msg\` 对应目录（备份里还有 item 包，没装就不用管）。没备份就 Steam 验证完整性，或用 UXM / Nuxe 重新解包。
+把 `D:\ds3-msg-backup` 里 `zhocn\` 和 `engus\` 下的 `menu*.dcx`、`item*.dcx` 覆盖回 `$Game\msg\` 对应目录。没备份就 Steam 验证完整性，或用 UXM / Nuxe 重新解包。
 
 ### 双语范围
 
-| 文本 | 默认 | 说明 |
-|---|---|---|
-| 会話（NPC 对话） | **开** | 逐条合并，副语言为空的条目保持原样 |
-| ムービー字幕（过场字幕） | **开** | 同上 |
-| 菜单、按键提示、道具名/说明/背景故事、地名、帮助、血字留言、系统消息、事件文本 | 关 | 保持原版单语 |
+`tools\dualsub.config.json` 里所有类别都开着，六个包里能配上的条目全部双语：NPC 对话、过场字幕、事件文本、弹窗确认按钮、菜单、按键提示和一行帮助、系统消息、地名、道具名/说明/背景故事、血字留言。**逐条合并，不按词跳过** —— `是` / `否` / `确定` / `取消` 也照样带上另一语言。
 
-启用的类别里**逐条全部合并，不按词跳过**：`是` / `否` / `确定` / `取消` 这类短词同样会带上另一语言。不想让某一类双语就把它设成 `"off"`。
-
-要开别的类别，改 `tools\dualsub.config.json` 里的 `categories` 再重新生成。开了道具名/说明/背景故事，成品里就会多出 `item*.msgbnd.dcx`，照第 2 步一起覆盖即可（上面备份已经把 item 包一起备下）。长说明类（道具说明、背景故事）面板放不下两种语言，建议设成 `"en_only"` 只看英文。
+不想让某一类双语，把它设成 `"off"`；长说明面板塞不下两种语言时可设成 `"en_only"` 只看英文。改完执行下面的重新生成。
 
 ### 重新生成
 
@@ -59,19 +53,20 @@ python tools\dualsub.py
 
 配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（默认换行）、`default_enabled`（没在 `categories` 里列出的类别是否合并）、`categories`（`true` 双语 · `"off"` 原样 · `"en_only"` 只留副语言 · `"append"` 强行追加）、`files`（按包、按 FMG 覆盖分隔符，如 `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
 
-分隔符是自动的：对话、字幕、说明类用换行，名称、地名、按键提示用 ` / `。
+分隔符是自动的：对话、字幕、说明类用换行，名称、地名、按键提示、弹窗按钮用 ` / `。
 
 ### 已知限制
 
 - 只改文本。别的 mod 也换 `msg` 时，把那个 mod 的文件放进 `source\` 再生成。
 - 如果只启用了部分类别，没合并到内容的包不会被生成，游戏继续读原版的那几个包。
-- 同一句话中文一行、英文可能折成两三行，个别对话会顶到对话框下沿。
+- 同一句话中文一行、英文可能折成两三行，个别对话会顶到对话框下沿；菜单标签和道具说明也一样会变长，个别会被截掉。
+- 道具说明/背景故事的面板高度是固定的，中英两段放不下，底部会被切掉 —— 在意就把这两类设成 `"en_only"`。
 
 ---
 
 ## English
 
-With the default config this replaces 6 text packs — NPC dialogue and cutscene subtitles — `Game\msg\<language>\menu.msgbnd.dcx / menu_dlc1 / menu_dlc2`. Exe, params, saves and item text are untouched.
+This replaces the 6 text packs under `Game\msg\<language>\`: `menu` / `menu_dlc1` / `menu_dlc2` / `item` / `item_dlc1` / `item_dlc2` (`.msgbnd.dcx`). All in-game text is bilingual. Exe, params and saves are untouched.
 
 ### Install
 
@@ -80,7 +75,7 @@ Requires the loose-file setup (unpacked with UXM / Nuxe, so `Game\msg\` holds re
 ```powershell
 $Game = "X:\Steam\steamapps\common\DARK SOULS III\Game"
 
-# 1) back up the originals (once; menu*.dcx is what gets replaced now, item*.dcx for enabling item text later)
+# 1) back up the originals (once; both menu*.dcx and item*.dcx get replaced)
 robocopy "$Game\msg" "D:\ds3-msg-backup" menu*.dcx item*.dcx /S
 
 # 2) overwrite (run from this repository's root)
@@ -91,19 +86,13 @@ Start the game offline afterwards. Game updates and Steam "verify integrity" ove
 
 ### Uninstall
 
-Copy the `menu*.dcx` files from `D:\ds3-msg-backup\zhocn\` and `\engus\` back into the matching `$Game\msg\` folders (the backup also holds the item packs — ignore them if you never installed them). No backup? Use Steam's verify integrity, or re-unpack with UXM / Nuxe.
+Copy the `menu*.dcx` and `item*.dcx` files from `D:\ds3-msg-backup\zhocn\` and `\engus\` back into the matching `$Game\msg\` folders. No backup? Use Steam's verify integrity, or re-unpack with UXM / Nuxe.
 
 ### What is bilingual
 
-| Text | Default | Notes |
-|---|---|---|
-| 会話 (NPC dialogue) | **on** | merged entry by entry; entries with no secondary text stay as they are |
-| ムービー字幕 (cutscene subtitles) | **on** | same |
-| Menus, key prompts, item names/descriptions/lore, place names, help text, blood messages, system messages, event text | off | vanilla single language |
+Every category in `tools\dualsub.config.json` is on, so every entry that pairs up in those six packs is bilingual: NPC dialogue, cutscene subtitles, event text, popup confirm buttons, menus, key prompts and one-line help, system messages, place names, item names/descriptions/lore, blood messages. **Nothing is skipped by word** — short answers like `是` / `否` / `确定` / `取消` carry the other language too.
 
-Every entry in an enabled category is merged — **nothing is skipped by word**, so short answers like `是` / `否` also carry the other language. Put a category at `"off"` if you do not want it bilingual.
-
-Turn more on under `categories` in `tools\dualsub.config.json` and rebuild: enabling item names/descriptions/lore also produces `item*.msgbnd.dcx`, which you then copy over with step 2 (the backup above already covers the item packs). Long description panels cannot fit both languages — set those to `"en_only"` to read the English instead.
+Put a category at `"off"` if you do not want it bilingual; use `"en_only"` for panels that cannot fit both languages. Then rebuild below.
 
 ### Rebuild
 
@@ -122,13 +111,14 @@ Arguments only when you need a different path or a partial rebuild: `--source` /
 
 Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (default newline), `default_enabled` (whether categories missing from `categories` get merged), `categories` (`true` bilingual · `"off"` untouched · `"en_only"` secondary language only · `"append"` force-append), `files` (per-pack, per-FMG separator override, e.g. `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
 
-The separator is chosen automatically: dialogue, subtitles and descriptions use a newline; names, place names and key prompts use ` / `.
+The separator is chosen automatically: dialogue, subtitles and descriptions use a newline; names, place names, key prompts and popup buttons use ` / `.
 
 ### Known limitations
 
 - Text only. If another mod also replaces `msg` files, drop that mod's files into `source\` and rebuild.
 - Packs where nothing gets merged are not generated, so the game keeps reading the vanilla copies of those.
-- A Chinese line plus an English one that wraps to two lines can sit tight against the bottom of the dialogue box.
+- A Chinese line plus an English one that wraps to two lines can sit tight against the bottom of the dialogue box; menu labels and item text grow the same way and some get clipped.
+- The item description / lore panel has a fixed height and cannot fit both languages — the bottom is cut off. Set those two categories to `"en_only"` if that bothers you.
 
 ---
 

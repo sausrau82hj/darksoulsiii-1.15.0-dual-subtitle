@@ -412,6 +412,9 @@ def separator_for(cfg: dict, pack: str, fmg: str) -> str:
     if isinstance(v, dict) and v.get("separator") is not None:
         return v["separator"]
     base = os.path.splitext(fmg)[0]
+    # Popup confirm windows: buttons are one line, message rows keep their own newline
+    if base.startswith("FDP_ダイアログ"):
+        return None
     # Multiline widgets: dialogue / subtitles / long descriptions -> newline
     multiline_marks = ("会話", "ムービー字幕", "説明", "うんちく", "ダイアログ")
     if any(m in base for m in multiline_marks):
