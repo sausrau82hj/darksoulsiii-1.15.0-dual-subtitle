@@ -12,7 +12,6 @@ How it works (UXM loose-file setup):
   5. repack into .msgbnd.dcx into the mod folder for UXM loose-file loading
 
 Usage:
-  python dualsub.py --list                        # write the category template
   python dualsub.py                               # build everything from the config
   python dualsub.py --filter menu_dlc1            # only one pack (debugging)
   python dualsub.py --game "D:\\...\\Game" --out <folder>
@@ -291,9 +290,7 @@ def _value_mode(v) -> str:
 
 
 def enabled_for(cfg: dict, msgbnd: str, fmg: str) -> bool:
-    v = _cat_value(cfg, fmg)
-    if v is not None:
-        return _value_mode(v) != "off"
+    # files/ wins over the category, so a single FMG can be pulled out of its group
     node = cfg.get("files", {})
     for key in (msgbnd, stem_of(msgbnd)):
         if key in node:
@@ -306,6 +303,9 @@ def enabled_for(cfg: dict, msgbnd: str, fmg: str) -> bool:
                     if isinstance(val, dict):
                         return bool(val.get("enabled", True))
                     return bool(val)
+    v = _cat_value(cfg, fmg)
+    if v is not None:
+        return _value_mode(v) != "off"
     # Unlisted files fall back to the default; FMG-level rules apply globally
     rules = cfg.get("fmg", {})
     for pat, val in rules.items():
@@ -322,13 +322,16 @@ def mode_for(cfg: dict, pack: str, fmg: str) -> str:
       off     - do not merge (the default for long descriptions, which would not fit)
       en_only - replace this language with English (for text you want to read in English)
     """
-    v = _cat_value(cfg, fmg)
-    if v is not None:
-        return _value_mode(v)
+    # files/ wins over the category, so a single FMG can be handled differently
     entry = cfg.get("files", {}).get(stem_of(pack), {}).get("fmg", {})
     v = entry.get(fmg)
     if isinstance(v, dict) and v.get("mode"):
-        return v["mode"]
+        return str(v["mode"])
+    if isinstance(v, str):
+        return v
+    v = _cat_value(cfg, fmg)
+    if v is not None:
+        return _value_mode(v)
     base = os.path.splitext(fmg)[0]
     if any(m in base for m in ("説明", "うんちく")):
         return "off"
@@ -346,6 +349,15 @@ def discover(game: str, primary: str, secondary: str) -> list[str]:
     return sorted(names[k] for k in names if k in have)
 
 
+def sep_value(v):
+    """Separator from the config: None / "auto" / "" mean pick per FMG and per entry."""
+    if not isinstance(v, str):
+        return None
+    if v.strip().lower() in ("auto", "null") or v == "":
+        return None
+    return "\n" if v == "\\n" else v
+
+
 def separator_for(cfg: dict, pack: str, fmg: str) -> str:
     """Pick the separator between the two languages: ' / ' for single-line widgets
     (names / place names / prompts), a newline for multiline ones (dialogue and
@@ -353,8 +365,11 @@ def separator_for(cfg: dict, pack: str, fmg: str) -> str:
     stem = stem_of(pack)
     entry = cfg.get("files", {}).get(stem, {}).get("fmg", {})
     v = entry.get(fmg)
-    if isinstance(v, dict) and v.get("separator") is not None:
-        return v["separator"]
+    if isinstance(v, dict) and "separator" in v:
+        return sep_value(v["separator"])
+    forced = sep_value(cfg.get("separator"))
+    if forced is not None:
+        return forced
     base = os.path.splitext(fmg)[0]
     # Popup confirm windows: buttons are one line, message rows keep their own newline
     if base.startswith("FDP_ダイアログ"):
@@ -377,9 +392,6 @@ def separator_for(cfg: dict, pack: str, fmg: str) -> str:
 def build_one(game: str, out: str, cfg: dict, name: str, log, keep_work: bool,
               yabber_dir: str = "") -> dict:
     primary, secondary = cfg["primary"], cfg["secondary"]
-    sep = cfg.get("separator", "\n")
-    if sep == "\\n":
-        sep = "\n"
     stem = stem_of(name)
     work = os.path.join(out, "_work", stem)
     if os.path.isdir(work):
@@ -465,23 +477,6 @@ def build_one(game: str, out: str, cfg: dict, name: str, log, keep_work: bool,
     return stats
 
 
-def do_list(cfg_path: str, primary: str, secondary: str) -> None:
-    """Write a category template (needs no game folder and no Japanese file names)."""
-    template = {
-        "primary": primary,
-        "secondary": secondary,
-        "separator": "\n",
-        "default_enabled": True,
-        "categories": dict(DEFAULT_CATEGORIES),
-    }
-    with open(cfg_path, "w", encoding="utf-8") as fh:
-        json.dump(template, fh, ensure_ascii=False, indent=2)
-    print(f"Wrote category config: {cfg_path}")
-    print("Available categories:")
-    for name in list(DEFAULT_CATEGORIES):
-        print(f"  - {name}")
-
-
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Dark Souls III dual-language text pack builder")
     ap.add_argument("--game", default=None, help="game folder holding msg/ (auto-detected by default)")
@@ -492,7 +487,6 @@ def main(argv=None) -> int:
     ap.add_argument("--secondary", default=None, help="secondary language folder (default engus)")
     ap.add_argument("--filter", default=None, help="only build packs whose name matches this wildcard")
     ap.add_argument("--source", default=None, help="vanilla msg folder (default: same as --game)")
-    ap.add_argument("--list", action="store_true", help="write the category template to tools/dualsub.template.json")
     ap.add_argument("--keep-work", action="store_true", help="keep the intermediate files")
     args = ap.parse_args(argv)
     # When run with no arguments (e.g. double-clicked in Explorer) keep the window open at the end
@@ -504,13 +498,6 @@ def main(argv=None) -> int:
     if args.secondary:
         cfg["secondary"] = args.secondary
     primary, secondary = cfg.get("primary", "zhocn"), cfg.get("secondary", "engus")
-
-    if args.list:
-        # Template export only: no game folder needed, and the active config is not overwritten by default
-        if os.path.abspath(args.config) == os.path.abspath(DEFAULT_CONFIG):
-            args.config = os.path.join(os.path.dirname(DEFAULT_CONFIG), "dualsub.template.json")
-        do_list(args.config, primary, secondary)
-        return 0
 
     # With a bundled source\ the default is an in-place rebuild: read source\, write <package>/msg\
     pack_src = os.path.join(PACK_ROOT, "source")

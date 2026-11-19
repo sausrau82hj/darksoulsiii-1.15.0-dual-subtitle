@@ -30,11 +30,11 @@ python tools\dualsub.py
 ```
 
 不带参数就是默认行为：拿包里的 `source\` 当源，成品写回包里的 `msg\`，跑完按上面第 2 步覆盖进游戏。
-要换路径或只重建一部分时才加参数：`--source` / `--out`（这一步的源和成品目录）、`--yabber`（Yabber 不在包内时）、`--filter "menu*"`（只重建匹配的包）、`--list`（导出分类模板到 `tools\dualsub.template.json`）、`--keep-work`（保留中间文件查错）。
+要换路径或只重建一部分时才加参数：`--source` / `--out`（这一步的源和成品目录）、`--yabber`（Yabber 不在包内时）、`--filter "menu*"`（只重建匹配的包）、`--keep-work`（保留中间文件查错）。
 
-配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（默认换行）、`default_enabled`（没在 `categories` 里列出的类别是否合并）、`categories`（`true` 双语 · `"off"` 原样 · `"sec_only"` 只留副语言 · `"append"` 强行追加）、`files`（按包、按 FMG 覆盖分隔符，如 `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
+配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（默认 `"auto"` 自动挑；填具体字符串如 `" / "` 就全局强制）、`default_enabled`（没在 `categories` 里列出的类别是否合并）、`categories`（`true` 合并双语 · `"off"` 原样不动 · `"en_only"` 只留副语言，即只显示英文）、`files`（按包、按 FMG 覆盖，优先级高于 `categories`，可写 `mode` / `enabled` / `separator`，如 `{"menu_dlc2": {"fmg": {"地名.fmg": {"separator": " / "}}}}`）。
 
-分隔符是自动的：对话、字幕、说明类用换行，名称、地名、按键提示用 ` / `。
+分隔符默认自动：对话、字幕、说明、背景故事用换行，名称、地名、菜单、按键提示用 ` / `，剩下的逐条判断（原文带换行就用换行，否则 ` / `）。要固定就写 `separator`，全局或按 FMG 都行，填 `"auto"` 回到自动。
 
 ### 已知限制
 
@@ -72,11 +72,11 @@ python tools\dualsub.py
 
 No arguments is the default: it reads the bundled `source\` and writes the packs back into the package's `msg\`; then install with step 2 above. 
 
-Arguments only when you need a different path or a partial rebuild: `--source` / `--out` (source and output folders), `--yabber` (Yabber outside the package), `--filter "menu*"` (rebuild matching packs only), `--list` (write the category template to `tools\dualsub.template.json`), `--keep-work` (keep intermediate files).
+Arguments only when you need a different path or a partial rebuild: `--source` / `--out` (source and output folders), `--yabber` (Yabber outside the package), `--filter "menu*"` (rebuild matching packs only), `--keep-work` (keep intermediate files).
 
-Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (default newline), `default_enabled` (whether categories missing from `categories` get merged), `categories` (`true` bilingual · `"off"` untouched · `"sec_only"` secondary language only · `"append"` force-append), `files` (per-pack, per-FMG separator override, e.g. `{"menu": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
+Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (default `"auto"`, picked per widget; any concrete string such as `" / "` forces it everywhere), `default_enabled` (whether categories missing from `categories` get merged), `categories` (`true` merge both · `"off"` untouched · `"en_only"` secondary language only, i.e. English), `files` (per-pack, per-FMG override, wins over `categories`; accepts `mode` / `enabled` / `separator`, e.g. `{"menu_dlc2": {"fmg": {"地名.fmg": {"separator": " / "}}}}`).
 
-The separator is chosen automatically: dialogue, subtitles and descriptions use a newline; names, place names and key prompts use ` / `.
+The separator is automatic by default: dialogue, subtitles, descriptions and lore use a newline; names, place names, menus and key prompts use ` / `; the rest is decided per entry (newline if the source text has one, otherwise ` / `). Override it with `separator`, globally or per FMG; `"auto"` goes back to the automatic choice.
 
 ### Known limitations
 

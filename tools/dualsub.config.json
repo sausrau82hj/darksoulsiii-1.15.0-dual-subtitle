@@ -2,7 +2,7 @@
   "yabber_dir": "",
   "primary": "zhocn",
   "secondary": "engus",
-  "separator": "\n",
+  "separator": "auto",
   "default_enabled": true,
   "categories": {
     "Dialogue": true,
