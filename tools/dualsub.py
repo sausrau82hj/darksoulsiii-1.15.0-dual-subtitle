@@ -42,12 +42,10 @@ DEFAULT_OUT = os.path.join(SCRIPT_DIR, "DualSubtitle")
 DEFAULT_CONFIG = os.path.join(SCRIPT_DIR, "dualsub.config.json")
 
 YABBER_HELP = (
-    "Yabber 未找到 / Yabber not found.\n"
-    "  把 Yabber 解压到本包根目录（如 DualSubtitle\\Yabber 1.3.1\\）再运行，\n"
-    "  或用 --yabber 参数、config 里的 \"yabber_dir\"、或 YABBER_DIR 环境变量指向\n"
-    "  同时含 Yabber.exe 与 Yabber.DCX.exe 的文件夹。\n"
+    "Yabber not found.\n"
     "  Extract Yabber anywhere under this package's root folder, or pass --yabber <dir>,\n"
     "  set \"yabber_dir\" in the config, or set the YABBER_DIR environment variable.\n"
+    "  The folder must hold both Yabber.exe and Yabber.DCX.exe.\n"
     "  Download: https://github.com/JKAnderson/Yabber/releases"
 )
 
@@ -110,34 +108,6 @@ def default_game() -> str:
 
 NULL_MARKERS = {"%null%", "null", ""}
 
-# Human-readable name of each text category (used by the config file and --list)
-CATEGORY_HINT = {
-    "ダイアログ": "对话（通用对话框）",
-    "会話": "NPC 对话字幕",
-    "ムービー字幕": "过场动画字幕",
-    "イベントテキスト": "事件/剧情文本",
-    "インゲームメニュー": "游戏内菜单",
-    "キーガイド": "按键提示",
-    "FDP_キーガイド": "按键提示(FDP)",
-    "FDP_ダイアログ": "对话框(FDP)",
-    "FDP_メニューテキスト": "菜单文本(FDP)",
-    "FDP_一行ヘルプ": "一行帮助(FDP)",
-    "FDP_システムメッセージ_win64": "系统消息(PC)",
-    "FDP_システムメッセージ_ps4": "系统消息(PS4)",
-    "FDP_システムメッセージ_xboxone": "系统消息(Xbox)",
-    "マップ": "地图/区域大字",
-    "地名": "地名",
-    "アイテム": "物品名/说明",
-    "武器": "武器",
-    "防具": "防具",
-    "指輪": "戒指",
-    "魔術": "法术",
-    "奇跡": "奇迹",
-    "呪術": "咒术",
-    "スキル": "技能",
-}
-
-
 def norm(t: str) -> str:
     return re.sub(r"\s+", "", t or "").lower()
 
@@ -193,7 +163,7 @@ class FmgXml:
     def merge(self, other: "FmgXml", sep, log) -> int:
         """Append every text of other behind self, and self behind other.
         sep=None picks per entry: a newline when the source has one, otherwise ' / '
-        (single-line widgets). Every entry is merged, short answers such as 是/否 included.
+        (single-line widgets). Every entry is merged, short answers such as yes/no included.
         Returns the number of edits."""
         changed = 0
         for key, el in self.entries.items():
@@ -288,30 +258,11 @@ DEFAULT_CATEGORIES = {
     "System Messages": True,
     "Place Names": True,
     "Item Names": True,
-    "Item Descriptions": "off",
-    "Item Lore": "off",
+    "Item Descriptions": True,
+    "Item Lore": True,
     "Blood Messages": True,
     "Other": True,
 }
-
-# Old Chinese category names are still accepted in config files
-CATEGORY_ALIASES = {
-    "对话字幕": "Dialogue",
-    "过场字幕": "Cutscene Subtitles",
-    "对话框": "Dialogue Boxes",
-    "事件/剧情文本": "Event Text",
-    "菜单文字": "Menu Text",
-    "按键提示": "Key Prompts",
-    "帮助提示": "Help Text",
-    "系统消息": "System Messages",
-    "地名/区域大字": "Place Names",
-    "物品名称": "Item Names",
-    "物品说明": "Item Descriptions",
-    "物品背景故事": "Item Lore",
-    "血字留言": "Blood Messages",
-    "其他文本": "Other",
-}
-
 
 def category_of(fmg: str) -> str:
     base = os.path.basename(fmg)
@@ -325,14 +276,7 @@ def _cat_value(cfg: dict, fmg: str):
     cats = cfg.get("categories")
     if not cats:
         return None
-    name = category_of(fmg)
-    if name in cats:
-        return cats[name]
-    # accept legacy Chinese names too
-    for alias, canon in CATEGORY_ALIASES.items():
-        if canon == name and alias in cats:
-            return cats[alias]
-    return None
+    return cats.get(category_of(fmg))
 
 
 def _value_mode(v) -> str:
@@ -539,17 +483,17 @@ def do_list(cfg_path: str, primary: str, secondary: str) -> None:
 
 
 def main(argv=None) -> int:
-    ap = argparse.ArgumentParser(description="DS3 双语字幕文本工具")
-    ap.add_argument("--game", default=None, help="游戏 Game 目录 (默认自动定位)")
-    ap.add_argument("--out", default=None, help="输出 mod 目录 (默认: 脚本所在目录下的 DualSubtitle)")
-    ap.add_argument("--config", default=DEFAULT_CONFIG, help="配置文件")
-    ap.add_argument("--yabber", default="", help="Yabber 所在文件夹（含 Yabber.exe / Yabber.DCX.exe）")
-    ap.add_argument("--primary", default=None, help="主语言目录 (默认 zhocn)")
-    ap.add_argument("--secondary", default=None, help="副语言目录 (默认 engus)")
-    ap.add_argument("--filter", default=None, help="只处理名称匹配的文本包 (通配符)")
-    ap.add_argument("--source", default=None, help="原始 msg 来源目录（默认与 --game 相同）")
-    ap.add_argument("--list", action="store_true", help="导出分类配置模板（默认 tools/dualsub.template.json）")
-    ap.add_argument("--keep-work", action="store_true", help="保留中间文件")
+    ap = argparse.ArgumentParser(description="Dark Souls III dual-language text pack builder")
+    ap.add_argument("--game", default=None, help="game folder holding msg/ (auto-detected by default)")
+    ap.add_argument("--out", default=None, help="output folder (default: the package's msg/)")
+    ap.add_argument("--config", default=DEFAULT_CONFIG, help="config file to read")
+    ap.add_argument("--yabber", default="", help="folder holding Yabber.exe and Yabber.DCX.exe")
+    ap.add_argument("--primary", default=None, help="primary language folder (default zhocn)")
+    ap.add_argument("--secondary", default=None, help="secondary language folder (default engus)")
+    ap.add_argument("--filter", default=None, help="only build packs whose name matches this wildcard")
+    ap.add_argument("--source", default=None, help="vanilla msg folder (default: same as --game)")
+    ap.add_argument("--list", action="store_true", help="write the category template to tools/dualsub.template.json")
+    ap.add_argument("--keep-work", action="store_true", help="keep the intermediate files")
     args = ap.parse_args(argv)
     # When run with no arguments (e.g. double-clicked in Explorer) keep the window open at the end
     interactive = not (argv if argv is not None else sys.argv[1:])
@@ -574,11 +518,11 @@ def main(argv=None) -> int:
     src_game = (pack_src if use_pack_src else None) or args.source or args.game or default_game()
     if not os.path.isdir(src_game):
         raise SystemExit(f"Text pack directory not found: {src_game}\n"
-                         r"用 --source 指向本包的 source 目录，或用 --game 指定 {游戏}\Game 目录。")
+                         "Point --source at the package's source folder, or --game at the game's Game folder.")
 
     if not args.out:
         args.out = PACK_ROOT if use_pack_src else DEFAULT_OUT
-        print(f"输出到本包 / writing to {args.out}")
+        print(f"Writing to {args.out}")
 
     names = discover(src_game, primary, secondary)
     # ngword holds the profanity list and never takes part in the dual-language display
@@ -622,7 +566,7 @@ def main(argv=None) -> int:
     print(f"Mod files in: {args.out}")
     if interactive and sys.stdin is not None and sys.stdin.isatty():
         try:
-            input("\n按回车退出 / press Enter to close")
+            input("\nPress Enter to close")
         except EOFError:
             pass
     return 0

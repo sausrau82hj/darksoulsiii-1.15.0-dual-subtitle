@@ -131,3 +131,5 @@ The shipped packs replace whole files. A few widgets have fixed-size boxes — t
 ### License
 
 Scripts: MIT — see [LICENSE](LICENSE). The generated text is modified FromSoftware / Bandai Namco game text, included for offline single-player modding, not for commercial use. Not affiliated with FromSoftware or Bandai Namco.
+
+Change history: [CHANGELOG.md](CHANGELOG.md).
