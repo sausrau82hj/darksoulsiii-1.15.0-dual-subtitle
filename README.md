@@ -13,11 +13,11 @@ DARK SOULS III 1.15.0
 先关游戏，装完离线启动。两种方式任选：
 
 - **替换文件**：游戏需用 UXM / Nuxe 解包过（`Game\msg\` 里是散文件），用本包的 `msg` 文件夹替换 `Game\msg`。
-- **Mod Engine 2**：不用解包。把本包的 `msg` 文件夹放进 Mod Engine 2 的 `mod` 文件夹，结构对成 `mod\msg\zhocn\...` 和 `mod\msg\engus\...`，用它的 `launchmod_darksouls3.bat` 启动游戏；从 Steam 直接启动不带 mod。本 mod 只碰 `msg`，其它 Mod Engine mod 照常叠在上面。
+- **Mod Engine**：不用解包。把 Mod Engine 的 `dinput8.dll` 和 `modengine.ini` 放进 `DARK SOULS III\Game`，在 `Game` 下新建一个文件夹（比如 `Game\DualSubtitle`）装本包的 `msg`，再把 `modengine.ini` 里的 `modOverrideDirectory` 指向它：`modOverrideDirectory="\DualSubtitle"`，然后正常启动游戏。Mod Engine 会挡住联网、另存一份 mod 存档，本体文件一个不动；别的 mod 也走 Mod Engine 时，文件放同一个覆盖文件夹里就行。
 
 ### 卸载
 
-替换文件安装的，把 `msg` 文件夹换回去，原文件夹在 `...source/msg`；Mod Engine 安装的，把 `mod\msg` 里那些文件删掉，游戏本体没被改过。
+替换文件安装的，把 `msg` 文件夹换回去，原文件夹在 `...source/msg`；Mod Engine 安装的，删掉 `modOverrideDirectory` 指向的那个文件夹（改回 ini 那行也行），要彻底还原再把 `dinput8.dll` 删掉。
 
 ### 重新生成
 
@@ -60,11 +60,11 @@ python tools\dualsub.py
 Close the game first, start it offline afterwards. Two routes, either one:
 
 - **Replace the files**: requires the loose-file setup (unpacked with UXM / Nuxe, so `Game\msg\` holds real files) — replace `Game\msg` with this package's `msg` folder.
-- **Mod Engine 2**: no unpacking needed. Drop this package's `msg` folder into Mod Engine 2's `mod` folder so the layout is `mod\msg\zhocn\...` and `mod\msg\engus\...`, then launch the game through its `launchmod_darksouls3.bat`; starting from Steam directly runs the unmodded game. This mod only touches `msg`, so other Mod Engine mods stack on top normally.
+- **Mod Engine**: no unpacking needed. Put Mod Engine's `dinput8.dll` and `modengine.ini` into `DARK SOULS III\Game`, create a folder under `Game` (say `Game\DualSubtitle`) holding this package's `msg`, then point `modOverrideDirectory` in `modengine.ini` at it: `modOverrideDirectory="\DualSubtitle"`, and start the game normally. Mod Engine blocks online play and keeps a separate mod save file; nothing in the base game is touched. If another mod also runs through Mod Engine, put its files in the same override folder.
 
 ### Uninstall
 
-Installed by replacing files: put the `msg` folder back — the original one is in `...source/msg`. Installed through Mod Engine: delete those files from `mod\msg`; the game itself was never changed.
+Installed by replacing files: put the `msg` folder back — the original one is in `...source/msg`. Installed through Mod Engine: delete the folder `modOverrideDirectory` points at (or point that line back), and remove `dinput8.dll` if you want the game fully vanilla again.
 
 ### Rebuild
 
