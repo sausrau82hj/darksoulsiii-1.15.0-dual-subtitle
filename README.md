@@ -38,6 +38,7 @@ python tools\dualsub.py
 
 ### 已知限制
 
+- 只在1.15.0验证过。
 - 只改文本。别的 mod 也换 `msg` 时，把那个 mod 的文件放进 `source\` 再生成。
 - 同一句话中文一行、英文可能折成两三行，个别对话会顶到对话框下沿。
 
@@ -84,6 +85,7 @@ Separators: text that already wraps keeps a newline and is not configurable; sin
 
 ### Known limitations
 
+- Verified on 1.15.0 only.
 - Text only. If another mod also replaces `msg` files, drop that mod's files into `source\` and rebuild.
 - A Chinese line plus an English one that wraps to two lines can sit tight against the bottom of the dialogue box.
 
