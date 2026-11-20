@@ -1,6 +1,6 @@
 # DualSubtitle — Dark Souls III Chinese–English dual-language text · 中英双语文本
 
-DARK SOULS III 1.15.0
+DARK SOULS III
 
 [中文](#中文) · [English](#english)
 
