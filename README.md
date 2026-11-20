@@ -13,11 +13,11 @@ DARK SOULS III 1.15.0
 先关游戏，装完离线启动。两种方式任选：
 
 - **替换文件**：游戏需用 UXM / Nuxe 解包过（`Game\msg\` 里是散文件），用本包的 `msg` 文件夹替换 `Game\msg`。
-- **Mod Engine**：不用解包。把 Mod Engine 的 `dinput8.dll` 和 `modengine.ini` 放进 `DARK SOULS III\Game`，在 `Game` 下新建一个文件夹（比如 `Game\DualSubtitle`）装本包的 `msg`，再把 `modengine.ini` 里的 `modOverrideDirectory` 指向它：`modOverrideDirectory="\DualSubtitle"`，然后正常启动游戏。Mod Engine 会挡住联网、另存一份 mod 存档，本体文件一个不动；别的 mod 也走 Mod Engine 时，文件放同一个覆盖文件夹里就行。
+- **Mod Engine**：不用解包。把 Mod Engine 的 `dinput8.dll` 和 `modengine.ini` 放进 `DARK SOULS III\Game`，本包的 `msg` 放进 `Game\mod\msg`（即 `Game\mod\msg\zhocn\...`、`Game\mod\msg\engus\...`），`modengine.ini` 里保持 `modOverrideDirectory="\mod"`，然后正常启动游戏。Mod Engine 会挡住联网、另存一份 mod 存档，本体文件一个不动；别的 mod 也走 Mod Engine 时，文件放同一个 `Game\mod` 里就行。
 
 ### 卸载
 
-替换文件安装的，把 `msg` 文件夹换回去，原文件夹在 `...source/msg`；Mod Engine 安装的，删掉 `modOverrideDirectory` 指向的那个文件夹（改回 ini 那行也行），要彻底还原再把 `dinput8.dll` 删掉。
+替换文件安装的，把 `msg` 文件夹换回去，原文件夹在 `...source/msg`；Mod Engine 安装的，删掉 `Game\mod` 里的文件（整个 `Game\mod` 一起删也行），`modengine.ini` 那行不用动，要彻底还原再把 `dinput8.dll` 删掉。
 
 ### 重新生成
 
@@ -60,11 +60,11 @@ python tools\dualsub.py
 Close the game first, start it offline afterwards. Two routes, either one:
 
 - **Replace the files**: requires the loose-file setup (unpacked with UXM / Nuxe, so `Game\msg\` holds real files) — replace `Game\msg` with this package's `msg` folder.
-- **Mod Engine**: no unpacking needed. Put Mod Engine's `dinput8.dll` and `modengine.ini` into `DARK SOULS III\Game`, create a folder under `Game` (say `Game\DualSubtitle`) holding this package's `msg`, then point `modOverrideDirectory` in `modengine.ini` at it: `modOverrideDirectory="\DualSubtitle"`, and start the game normally. Mod Engine blocks online play and keeps a separate mod save file; nothing in the base game is touched. If another mod also runs through Mod Engine, put its files in the same override folder.
+- **Mod Engine**: no unpacking needed. Put Mod Engine's `dinput8.dll` and `modengine.ini` into `DARK SOULS III\Game` and this package's `msg` into `Game\mod\msg` (so `Game\mod\msg\zhocn\...` and `Game\mod\msg\engus\...`), keep `modOverrideDirectory="\mod"` in `modengine.ini`, and start the game normally. Mod Engine blocks online play and keeps a separate mod save file; nothing in the base game is touched. If another mod also runs through Mod Engine, put its files in the same `Game\mod`.
 
 ### Uninstall
 
-Installed by replacing files: put the `msg` folder back — the original one is in `...source/msg`. Installed through Mod Engine: delete the folder `modOverrideDirectory` points at (or point that line back), and remove `dinput8.dll` if you want the game fully vanilla again.
+Installed by replacing files: put the `msg` folder back — the original one is in `...source/msg`. Installed through Mod Engine: delete the files under `Game\mod` (or the whole folder); the `modengine.ini` line stays as it is, and remove `dinput8.dll` if you want the game fully vanilla again.
 
 ### Rebuild
 
