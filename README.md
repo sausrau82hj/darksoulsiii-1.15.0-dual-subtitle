@@ -10,13 +10,14 @@ DARK SOULS III 1.15.0
 
 ### 安装
 
-前提：游戏用 UXM / Nuxe 解包过（`Game\msg\` 里是散文件），并且已关闭。
-1. 替换 `msg` 文件夹。
-2. 离线启动游戏。
+先关游戏，装完离线启动。两种方式任选：
+
+- **替换文件**：游戏需用 UXM / Nuxe 解包过（`Game\msg\` 里是散文件），用本包的 `msg` 文件夹替换 `Game\msg`。
+- **Mod Engine 2**：不用解包。把本包的 `msg` 文件夹放进 Mod Engine 2 的 `mod` 文件夹，结构对成 `mod\msg\zhocn\...` 和 `mod\msg\engus\...`，用它的 `launchmod_darksouls3.bat` 启动游戏；从 Steam 直接启动不带 mod。本 mod 只碰 `msg`，其它 Mod Engine mod 照常叠在上面。
 
 ### 卸载
 
-替换 `msg` 文件夹，原文件夹: `...source/msg`。
+替换文件安装的，把 `msg` 文件夹换回去，原文件夹在 `...source/msg`；Mod Engine 安装的，把 `mod\msg` 里那些文件删掉，游戏本体没被改过。
 
 ### 重新生成
 
@@ -56,13 +57,14 @@ python tools\dualsub.py
 
 ### Install
 
-Requires the loose-file setup (unpacked with UXM / Nuxe, so `Game\msg\` holds real files) and the game closed.
-1. Replace the `msg` folder.
-2. Start the game offline afterwards.
+Close the game first, start it offline afterwards. Two routes, either one:
+
+- **Replace the files**: requires the loose-file setup (unpacked with UXM / Nuxe, so `Game\msg\` holds real files) — replace `Game\msg` with this package's `msg` folder.
+- **Mod Engine 2**: no unpacking needed. Drop this package's `msg` folder into Mod Engine 2's `mod` folder so the layout is `mod\msg\zhocn\...` and `mod\msg\engus\...`, then launch the game through its `launchmod_darksouls3.bat`; starting from Steam directly runs the unmodded game. This mod only touches `msg`, so other Mod Engine mods stack on top normally.
 
 ### Uninstall
 
-Replace the `msg` folder. The original folder: `...source/msg`.
+Installed by replacing files: put the `msg` folder back — the original one is in `...source/msg`. Installed through Mod Engine: delete those files from `mod\msg`; the game itself was never changed.
 
 ### Rebuild
 
