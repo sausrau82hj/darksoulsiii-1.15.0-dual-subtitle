@@ -13,7 +13,7 @@ DARK SOULS III 1.15.0
 先关游戏，装完离线启动。两种方式任选：
 
 - **替换文件**：游戏需用 UXM / Nuxe 解包过（`Game\msg\` 里是散文件），用本包的 `msg` 文件夹替换 `Game\msg`。
-- **Mod Engine**：不用解包。把 Mod Engine 的 `dinput8.dll` 和 `modengine.ini` 放进 `DARK SOULS III\Game`，本包的 `msg` 放进 `Game\mod\msg`（即 `Game\mod\msg\zhocn\...`、`Game\mod\msg\engus\...`），`modengine.ini` 里保持 `modOverrideDirectory="\mod"`，然后正常启动游戏。游戏是 1.15.2 或更高版本时用打过补丁的 [Mod Engine 1 - patched for 1.15.2](https://www.nexusmods.com/darksouls3/mods/2410)（解压到游戏目录、和 exe 同级即可，用法一样），原版 0.1.13 在新版本上起不来。Mod Engine 会挡住联网、另存一份 mod 存档，本体文件一个不动；别的 mod 也走 Mod Engine 时，文件放同一个 `Game\mod` 里就行。
+- **Mod Engine**：不用解包。把 [Mod Engine](https://www.nexusmods.com/darksouls3/mods/332) 的 `dinput8.dll` 和 `modengine.ini` 放进 `DARK SOULS III\Game`，本包的 `msg` 放进 `Game\mod\msg`（即 `Game\mod\msg\zhocn\...`、`Game\mod\msg\engus\...`），`modengine.ini` 里保持 `modOverrideDirectory="\mod"`，然后正常启动游戏。游戏是 1.15.2 或更高版本时用打过补丁的 [Mod Engine 1 - patched for 1.15.2](https://www.nexusmods.com/darksouls3/mods/2410)（解压到游戏目录、和 exe 同级即可，用法一样），原版 0.1.13 在新版本上起不来。Mod Engine 会挡住联网、另存一份 mod 存档，本体文件一个不动；别的 mod 也走 Mod Engine 时，文件放同一个 `Game\mod` 里就行。
 
 ### 卸载
 
@@ -60,7 +60,7 @@ python tools\dualsub.py
 Close the game first, start it offline afterwards. Two routes, either one:
 
 - **Replace the files**: requires the loose-file setup (unpacked with UXM / Nuxe, so `Game\msg\` holds real files) — replace `Game\msg` with this package's `msg` folder.
-- **Mod Engine**: no unpacking needed. Put Mod Engine's `dinput8.dll` and `modengine.ini` into `DARK SOULS III\Game` and this package's `msg` into `Game\mod\msg` (so `Game\mod\msg\zhocn\...` and `Game\mod\msg\engus\...`), keep `modOverrideDirectory="\mod"` in `modengine.ini`, and start the game normally. On game version 1.15.2 or newer use the patched [Mod Engine 1 - patched for 1.15.2](https://www.nexusmods.com/darksouls3/mods/2410) instead (extract it into the game folder, next to the exe; everything else works the same) — the original 0.1.13 will not launch on those versions. Mod Engine blocks online play and keeps a separate mod save file; nothing in the base game is touched. If another mod also runs through Mod Engine, put its files in the same `Game\mod`.
+- **[Mod Engine](https://www.nexusmods.com/darksouls3/mods/332)**: no unpacking needed. Put its `dinput8.dll` and `modengine.ini` into `DARK SOULS III\Game` and this package's `msg` into `Game\mod\msg` (so `Game\mod\msg\zhocn\...` and `Game\mod\msg\engus\...`), keep `modOverrideDirectory="\mod"` in `modengine.ini`, and start the game normally. On game version 1.15.2 or newer use the patched [Mod Engine 1 - patched for 1.15.2](https://www.nexusmods.com/darksouls3/mods/2410) instead (extract it into the game folder, next to the exe; everything else works the same) — the original 0.1.13 will not launch on those versions. Mod Engine blocks online play and keeps a separate mod save file; nothing in the base game is touched. If another mod also runs through Mod Engine, put its files in the same `Game\mod`.
 
 ### Uninstall
 
