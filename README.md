@@ -1,55 +1,8 @@
-# DualSubtitle — Dark Souls III Chinese–English dual-language text · 中英双语文本
+# DualSubtitle — DARK SOULS III dual-language text · 中英双语文本
 
-DARK SOULS III
+Chinese and English in one line: `中文 / English`. Text only — no gameplay, balance or asset changes.
 
-[中文](#中文) · [English](#english)
-
----
-
-## 中文
-
-### 安装
-
-先关游戏，装完离线启动。两种方式任选：
-
-- **替换文件**：游戏需用 UXM / Nuxe 解包过（`Game\msg\` 里是散文件），用本包的 `msg` 文件夹替换 `Game\msg`。
-- **Mod Engine**：不用解包。把 [Mod Engine](https://www.nexusmods.com/darksouls3/mods/332) 的 `dinput8.dll` 和 `modengine.ini` 放进 `DARK SOULS III\Game`，本包的 `msg` 放进 `Game\mod\msg`（即 `Game\mod\msg\zhocn\...`、`Game\mod\msg\engus\...`），`modengine.ini` 里保持 `modOverrideDirectory="\mod"`，然后正常启动游戏。游戏是 1.15.2 或更高版本时用打过补丁的 [Mod Engine 1 - patched for 1.15.2](https://www.nexusmods.com/darksouls3/mods/2410)（解压到游戏目录、和 exe 同级即可，用法一样），原版 0.1.13 在新版本上起不来。Mod Engine 会挡住联网、另存一份 mod 存档，本体文件一个不动；别的 mod 也走 Mod Engine 时，文件放同一个 `Game\mod` 里就行。
-
-### 卸载
-
-替换文件安装的，把 `msg` 文件夹换回去，原文件夹在 `...source/msg`；Mod Engine 安装的，删掉 `Game\mod` 里的文件（整个 `Game\mod` 一起删也行），`modengine.ini` 那行不用动，要彻底还原再把 `dinput8.dll` 删掉。
-
-### 重新生成
-
-需要 **Python 3.9+** 和 [Yabber](https://github.com/JKAnderson/Yabber/releases)。
-
-1. 把 Yabber 解压到本包根目录，例如 `DualSubtitle\Yabber 1.3.1\`（脚本自己会找到，不用配路径）。
-2. 在包根目录执行：
-
-```
-python tools\dualsub.py
-```
-
-不带参数就是默认行为：拿包里的 `source\` 当源，成品写回包里的 `msg\`，跑完按上面第 2 步覆盖进游戏。
-要换路径或只重建一部分时才加参数：`--source` / `--out`（这一步的源和成品目录）、`--yabber`（Yabber 不在包内时）、`--filter "menu*"`（只重建匹配的包）、`--keep-work`（保留中间文件查错）。
-
-配置项：`primary` / `secondary`（默认 `zhocn` / `engus`，可以对调）、`separator`（单行文本的分隔符，默认 `" / "`）、`categories`（取值 `true` 合并双语 · `"off"` 原样不动 · `"sec_only"` 只留副语言）、`files`（例外清单，按包、按 FMG 单独设 `mode` / `enabled` / `separator`，优先级最高，如 `"files": {"menu_dlc2": {"fmg": {"地名.fmg": {"separator": " ~ "}, "アイテムうんちく.fmg": "sec_only"}}}`。
-
-分隔符：原本就带换行的固定用换行，不提供自定义；单行的默认用 ` / `，把 `separator` 改成 `" ~ "` 之类就跟着换。
-
-### 已知限制
-
-- 只在1.15.0验证过。
-- 只改文本。别的 mod 也换 `msg` 时，把那个 mod 的文件放进 `source\` 再生成。
-- 同一句话中文一行、英文可能折成两三行，个别对话会顶到对话框下沿。
-
-### 更精细的修改
-
-[WitchyBND](https://github.com/ividyon/WitchyBND/releases) ：解包，修改，打包，替换。
-
-### 致谢
-
-受到此项目启发而制。[ER-Dualsub-Tool](https://github.com/matyamod/ER-Dualsub-Tool)
+**English** · [中文](#中文)
 
 ---
 
@@ -57,51 +10,72 @@ python tools\dualsub.py
 
 ### Install
 
-Close the game first, start it offline afterwards. Two routes, either one:
-
-- **Replace the files**: requires the loose-file setup (unpacked with UXM / Nuxe, so `Game\msg\` holds real files) — replace `Game\msg` with this package's `msg` folder.
-- **[Mod Engine](https://www.nexusmods.com/darksouls3/mods/332)**: no unpacking needed. Put its `dinput8.dll` and `modengine.ini` into `DARK SOULS III\Game` and this package's `msg` into `Game\mod\msg` (so `Game\mod\msg\zhocn\...` and `Game\mod\msg\engus\...`), keep `modOverrideDirectory="\mod"` in `modengine.ini`, and start the game normally. On game version 1.15.2 or newer use the patched [Mod Engine 1 - patched for 1.15.2](https://www.nexusmods.com/darksouls3/mods/2410) instead (extract it into the game folder, next to the exe; everything else works the same) — the original 0.1.13 will not launch on those versions. Mod Engine blocks online play and keeps a separate mod save file; nothing in the base game is touched. If another mod also runs through Mod Engine, put its files in the same `Game\mod`.
-
-### Uninstall
-
-Installed by replacing files: put the `msg` folder back — the original one is in `...source/msg`. Installed through Mod Engine: delete the files under `Game\mod` (or the whole folder); the `modengine.ini` line stays as it is, and remove `dinput8.dll` if you want the game fully vanilla again.
+Copy this package's `msg` folder where your loader reads loose files: point any [Mod Engine](https://www.nexusmods.com/darksouls3/mods/332) version (1, 2 or me3) at it, or overwrite `Game\msg` after unpacking the game with UXM / Nuxe. Start the game offline.
 
 ### Rebuild
 
-Requires **Python 3.9+** and [Yabber](https://github.com/JKAnderson/Yabber/releases). 
-
-1. Extract Yabber anywhere under the package root, e.g. `DualSubtitle\Yabber 1.3.1\` (the script finds it, no path to configure).
-2. From the package root:
+Python 3.9+ and [Yabber](https://github.com/JKAnderson/Yabber/releases) extracted anywhere under the package root.
 
 ```
 python tools\dualsub.py
 ```
 
-No arguments is the default: it reads the bundled `source\` and writes the packs back into the package's `msg\`; then install with step 2 above. 
+Defaults: reads `source\`, writes `msg\`. Options: `--source` / `--out` (other folders), `--game` (game folder, auto-detected otherwise), `--yabber`, `--primary` / `--secondary`, `--filter "menu*"` (matching packs only), `--keep-work`.
 
-Arguments only when you need a different path or a partial rebuild: `--source` / `--out` (source and output folders), `--yabber` (Yabber outside the package), `--filter "menu*"` (rebuild matching packs only), `--keep-work` (keep intermediate files).
-
-Config keys: `primary` / `secondary` (default `zhocn` / `engus` — swap them freely), `separator` (the separator inside one line, default `" / "`), `categories` (`true` merge both · `"off"` untouched · `"sec_only"` secondary language only), `files` (the exception list: per-pack, per-FMG `mode` / `enabled` / `separator`, highest priority, e.g. ` "files": {"menu_dlc2": {"fmg": {"地名.fmg": {"separator": " ~ "}, "アイテムうんちく.fmg": "sec_only"}}}`
-
-Separators: text that already wraps keeps a newline and is not configurable; single-line text uses ` / ` by default, and `separator` changes it to something like `" ~ "`.
+`tools\dualsub.config.json`: `primary` / `secondary` (default `zhocn` / `engus`), `separator` (inside one line, default `" / "`), `categories` (`true` merge · `"off"` leave as-is · `"sec_only"` secondary only), `files` (per-pack and per-FMG overrides, highest priority). Text that already wraps keeps its newline.
 
 ### Known limitations
 
 - Verified on 1.15.0 only.
-- Text only. If another mod also replaces `msg` files, drop that mod's files into `source\` and rebuild.
-- A Chinese line plus an English one that wraps to two lines can sit tight against the bottom of the dialogue box.
+- Text only: if another mod also replaces `msg`, put its files in `source\` and rebuild.
+- A merged line can wrap to three lines and sit tight against the bottom of the dialogue box.
 
 ### Finer edits
 
-[WitchyBND](https://github.com/ividyon/WitchyBND/releases): unpack, edit, pack, replace.
+[WitchyBND](https://github.com/ividyon/WitchyBND/releases): unpack one pack, edit entries, repack.
 
 ### Credits
 
-Inspired by this one.[ER-Dualsub-Tool](https://github.com/matyamod/ER-Dualsub-Tool)
+Inspired by [ER-Dualsub-Tool](https://github.com/matyamod/ER-Dualsub-Tool).
+
+---
+
+## 中文
+
+### 安装
+
+把本包的 `msg` 放到你所用加载器的覆盖位置：用 [Mod Engine](https://www.nexusmods.com/darksouls3/mods/332)（1、2 或 me3）指向它，或者先用 UXM / Nuxe 解包、再覆盖 `Game\msg`。装完离线启动。
+
+### 重新生成
+
+需要 Python 3.9+ 和 [Yabber](https://github.com/JKAnderson/Yabber/releases)，解压到包内任意位置即可。
+
+```
+python tools\dualsub.py
+```
+
+默认读包里的 `source\`、写回包里的 `msg\`。可选参数：`--source` / `--out`（换目录）、`--game`（游戏目录，默认自动查找）、`--yabber`、`--primary` / `--secondary`（换主副语言）、`--filter "menu*"`（只重建匹配的包）、`--keep-work`（保留中间文件）。
+
+`tools\dualsub.config.json`：`primary` / `secondary`（默认 `zhocn` / `engus`）、`separator`（单行内的分隔符，默认 `" / "`）、`categories`（`true` 合并 · `"off"` 原样 · `"sec_only"` 只留副语言）、`files`（按包、按 FMG 覆盖，优先级最高）。原本带换行的文本固定保留换行。
+
+### 已知限制
+
+- 只在 1.15.0 验证过。
+- 只改文本；别的 mod 也换 `msg` 时，把它的文件放进 `source\` 再生成。
+- 合并后的行可能折到三行，个别对话会顶到对话框下沿。
+
+### 更精细的修改
+
+[WitchyBND](https://github.com/ividyon/WitchyBND/releases)：单独解包一个包，改完重新打包。
+
+### 致谢
+
+受 [ER-Dualsub-Tool](https://github.com/matyamod/ER-Dualsub-Tool) 启发而制。
 
 ---
 
 ## License / 许可证
 
-The MIT license in [LICENSE](LICENSE) covers only the Python scripts and the other original files written for this project — `tools/dualsub.py`, `tools/dualsub.config.json`, this README, the changelog. It does not cover the text packs under `msg/` and `source/` (modified FromSoftware / Bandai Namco game text, included for offline single-player modding, not for commercial use), nor the external tools listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Not affiliated with FromSoftware or Bandai Namco.
-Change history: [CHANGELOG.md](CHANGELOG.md).
+`LICENSE` (MIT) covers the files written for this project — `tools/dualsub.py`, its config, this README. It does not cover the game text under `msg/` and `source/` (modified FromSoftware / Bandai Namco text, offline single-player use only) or the external tools listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Not affiliated with FromSoftware or Bandai Namco.
+
+`LICENSE`（MIT）只覆盖本项目自己写的文件 —— `tools/dualsub.py`、它的配置、本 README；不覆盖 `msg/` 和 `source/` 里的游戏文本（FromSoftware / 万代南梦宫文本的修改版，仅供离线单人使用），也不覆盖 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) 里列出的外部工具。与 FromSoftware、万代南梦宫无关。

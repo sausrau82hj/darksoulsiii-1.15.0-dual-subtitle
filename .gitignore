@@ -1,12 +1,13 @@
-# build scratch + packaged zip
+# build scratch and packaged zips
 _work/
 *.zip
 
-# 运行 tools/dualsub.py 时生成的字节码
+# bytecode written by tools/dualsub.py
 __pycache__/
 *.pyc
 
-# --list 默认导出的配置模板
-tools/dualsub.template.json
-# Yabber 解压到包内也照样能找到，但不进仓库
+# Yabber can sit anywhere under the package root, but never in the repo
 Yabber*/
+
+# local Nexus description draft, not part of the package
+nexus-description.txt
