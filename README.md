@@ -75,5 +75,3 @@ python tools\dualsub.py
 ## License / 许可证
 
 `LICENSE` (MIT) covers the files written for this project — `tools/dualsub.py`, its config, this README. It does not cover the game text under `msg/` and `source/` (modified FromSoftware / Bandai Namco text, offline single-player use only) or the external tools listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Not affiliated with FromSoftware or Bandai Namco.
-
-`LICENSE`（MIT）只覆盖本项目自己写的文件 —— `tools/dualsub.py`、它的配置、本 README；不覆盖 `msg/` 和 `source/` 里的游戏文本（FromSoftware / 万代南梦宫文本的修改版，仅供离线单人使用），也不覆盖 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) 里列出的外部工具。与 FromSoftware、万代南梦宫无关。
