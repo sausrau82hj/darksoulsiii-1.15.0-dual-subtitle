@@ -104,4 +104,4 @@ python tools\dualsub.py
 
 ## License / 许可证
 
-[LICENSE](LICENSE) (MIT) covers the files written for this project — `tools/dualsub.py`, its config, this README. It does not cover the game text under `msg/` and `source/` (modified FromSoftware / Bandai Namco text, offline single-player use only) or the external tools listed in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Not affiliated with FromSoftware or Bandai Namco.
+[LICENSE](LICENSE) (MIT) covers the files written for this project — `tools/dualsub.py`, its config, this README. It does not cover the game text under `msg/` and `source/` (modified FromSoftware / Bandai Namco text, offline single-player use only). Not affiliated with FromSoftware or Bandai Namco.
