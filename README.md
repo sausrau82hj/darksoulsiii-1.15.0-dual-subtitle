@@ -10,7 +10,8 @@ Chinese and English in one line: `中文 / English`. Text only — no gameplay, 
 
 ### Install
 
-Copy this package's `msg` folder where your loader reads loose files: point any [Mod Engine](https://www.nexusmods.com/darksouls3/mods/2410) version (1, 2 or me3) at it, or overwrite `Game\msg` after unpacking the game with UXM / Nuxe. Start the game offline.
+- Place the `msg` folder from this package into the override directory used by your mod loader—point one of the following tools to it: [me](https://www.nexusmods.com/darksouls3/mods/2410), [me2](https://github.com/soulsmods/ModEngine2), or [me3](https://github.com/garyttierney/me3).
+- Alternatively, unpack the game files using UXM or Nuxe, then overwrite the `Game\msg` directory. Once installed, launch the game in offline mode.
 
 ### Rebuild
 
@@ -57,7 +58,8 @@ Inspired by [ER-Dualsub-Tool](https://github.com/matyamod/ER-Dualsub-Tool).
 
 ### 安装
 
-把本包的 `msg` 放到你所用加载器的覆盖位置：用 [Mod Engine](https://www.nexusmods.com/darksouls3/mods/2410)（1、2 或 me3）指向它，或者先用 UXM / Nuxe 解包、再覆盖 `Game\msg`。装完离线启动。
+- 把本包的 `msg` 放到你所用加载器的覆盖位置：用 [me](https://www.nexusmods.com/darksouls3/mods/2410) [me2](https://github.com/soulsmods/ModEngine2) [me3](https://github.com/garyttierney/me3)其中一个指向它。
+- 或者先用 UXM / Nuxe 解包、再覆盖 `Game\msg`。装完离线启动。
 
 ### 重新生成
 
