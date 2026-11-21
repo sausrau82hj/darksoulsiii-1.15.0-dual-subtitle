@@ -1,4 +1,4 @@
-# DualSubtitle — DARK SOULS III dual-language text · 中英双语文本
+# DualSubtitle — *DARK SOULS III* dual-language text · 中英双语文本
 
 Chinese and English in one line: `中文 / English`. Text only — no gameplay, balance or asset changes.
 
@@ -102,6 +102,6 @@ python tools\dualsub.py
 
 ---
 
-## License / 许可证
+## License
 
 [LICENSE](LICENSE) (MIT) covers the files written for this project — `tools/dualsub.py`, its config, this README. It does not cover the game text under `msg/` and `source/` (modified FromSoftware / Bandai Namco text, offline single-player use only). Not affiliated with FromSoftware or Bandai Namco.
