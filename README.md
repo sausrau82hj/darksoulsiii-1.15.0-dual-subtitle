@@ -48,10 +48,6 @@ Text that already wraps keeps its newline.
 
 [WitchyBND](https://github.com/ividyon/WitchyBND/releases): unpack one pack, edit entries, repack.
 
-### Credits
-
-Inspired by [ER-Dualsub-Tool](https://github.com/matyamod/ER-Dualsub-Tool).
-
 ---
 
 ## 中文
@@ -96,9 +92,11 @@ python tools\dualsub.py
 
 [WitchyBND](https://github.com/ividyon/WitchyBND/releases)：单独解包一个包，改完重新打包。
 
-### 致谢
+---
 
-受 [ER-Dualsub-Tool](https://github.com/matyamod/ER-Dualsub-Tool) 启发而制。
+## Credits
+
+Inspired by [ER-Dualsub-Tool](https://github.com/matyamod/ER-Dualsub-Tool).
 
 ---
 
