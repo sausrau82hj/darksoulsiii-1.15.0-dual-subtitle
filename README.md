@@ -58,7 +58,7 @@ Inspired by [ER-Dualsub-Tool](https://github.com/matyamod/ER-Dualsub-Tool).
 
 ### 安装
 
-- 把本包的 `msg` 放到你所用加载器的覆盖位置：用 [me](https://www.nexusmods.com/darksouls3/mods/2410) [me2](https://github.com/soulsmods/ModEngine2) [me3](https://github.com/garyttierney/me3)其中一个指向它。
+- 把本包的 `msg` 放到你所用加载器的覆盖位置：用 [me](https://www.nexusmods.com/darksouls3/mods/2410) [me2](https://github.com/soulsmods/ModEngine2) [me3](https://github.com/garyttierney/me3) 其中一个指向它。
 - 或者先用 UXM / Nuxe 解包、再覆盖 `Game\msg`。装完离线启动。
 
 ### 重新生成
