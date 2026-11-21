@@ -26,7 +26,6 @@ Defaults: reads `source\`, writes `msg\`. Options: `--source` / `--out` (other f
 
 ### Known limitations
 
-- Verified on 1.15.0 only.
 - Text only: if another mod also replaces `msg`, put its files in `source\` and rebuild.
 - A merged line can wrap to three lines and sit tight against the bottom of the dialogue box.
 
@@ -60,7 +59,6 @@ python tools\dualsub.py
 
 ### 已知限制
 
-- 只在 1.15.0 验证过。
 - 只改文本；别的 mod 也换 `msg` 时，把它的文件放进 `source\` 再生成。
 - 合并后的行可能折到三行，个别对话会顶到对话框下沿。
 
