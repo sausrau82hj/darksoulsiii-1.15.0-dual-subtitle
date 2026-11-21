@@ -1,4 +1,4 @@
-# Dual-Subtitle — *DARK SOULS III*
+# Dual Subtitle — *DARK SOULS III*
 
 Chinese and English in one line: `中文 / English`. Text only — no gameplay, balance or asset changes.
 
